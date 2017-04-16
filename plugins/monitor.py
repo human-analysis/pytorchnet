@@ -29,5 +29,8 @@ class Monitor:
 				self.losses[key] = self.losses[key]*self.smoothness + value*(1-self.smoothness)
 		self.num += batch_size
 
-	def getvalues(self):
-		return [self.losses[key] for key in self.keys]
+	def getvalues(self, key=None):
+		if key != None:
+			return self.losses[key]
+		if key == None:
+			return [self.losses[key] for key in self.keys]
