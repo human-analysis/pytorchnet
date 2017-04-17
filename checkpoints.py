@@ -7,24 +7,16 @@ class Checkpoints:
 	def __init__(self,args):
 		self.dir_save = args.save
 		self.dir_load = args.resume
-		self.prevmodel = args.prevmodel
 
 		if os.path.isdir(self.dir_save) == False:
 			os.makedirs(self.dir_save)
 
-	def latest(self):
-		output = {}
-		if self.dir_load == None:
-			output['resume'] = None
-		else:
-			output['resume'] = self.dir_load
-
-		if (self.prevmodel != None):
-			output['prevmodel'] = self.prevmodel
-		else:
-			output['prevmodel'] = None 
-
-		return output
+	def latest(self, name):
+		if name == 'resume':
+			if self.dir_load == None:
+				return None
+			else:
+				return self.dir_load
 
 	def save(self, epoch, model, best):
 		if best == True:

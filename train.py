@@ -109,7 +109,7 @@ class Trainer():
 		
 		loss = self.log_monitor_train.getvalues()
 		self.log_loss_train.update(loss)
-		return self.losses_train['loss']
+		return self.log_monitor_train.getvalues('loss')
 
 	def test(self, epoch, dataloader):
 		self.log_monitor_test.reset()
@@ -143,4 +143,4 @@ class Trainer():
 
 		loss = self.log_monitor_test.getvalues()
 		self.log_loss_test.update(loss)
-		return self.losses_test['loss']
+		return self.log_monitor_train.getvalues('loss')

@@ -25,7 +25,13 @@ class Model:
 
 	def setup(self, checkpoints):
 		model = models.resnet18()
-		criterion = losses.Regression()
+		criterion = losses.Classification()
+
+		if checkpoints.latest('resume') == None:
+			model.apply(weights_init)
+		else:
+			tmp = checkpoints.load(checkpoints['resume'])
+			model.load_state_dict(tmp)
 
 		if self.cuda:
 			model = model.cuda()

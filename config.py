@@ -17,7 +17,6 @@ parser.add_argument('--dataroot', type=str, default=None, metavar='', help='path
 parser.add_argument('--save', type=str, default=result_path +'Save', metavar='', help='save the trained models here')
 parser.add_argument('--logs', type=str, default=result_path +'Logs', metavar='', help='save the training log files here')
 parser.add_argument('--resume', type=str, default=None, metavar='', help='full path of models to resume training')
-parser.add_argument('--prevmodel', type=str, default=None, metavar='', help='full path of previous models')
 parser.add_argument('--nclasses', type=int, default=None, metavar='', help='number of classes for classification')
 parser.add_argument('--input-filename-test', type=str, default=None, metavar='', help='input test filename for filelist and folderlist')
 parser.add_argument('--label-filename-test', type=str, default=None, metavar='', help='label test filename for filelist and folderlist')
