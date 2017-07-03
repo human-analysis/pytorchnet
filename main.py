@@ -32,11 +32,11 @@ trainer = Trainer(args, model, criterion)
 loss_best = 1e10
 for epoch in range(args.nepochs):
 
-	# train for a single epoch
-	loss_train = trainer.train(epoch, loader_train)
-	loss_test = trainer.test(epoch, loader_test)
+    # train for a single epoch
+    loss_train = trainer.train(epoch, loader_train)
+    loss_test = trainer.test(epoch, loader_test)
 
-	if loss_best > loss_test:
-		model_best = True
-		loss_best = loss_test
-		checkpoints.save(epoch, model, model_best)
+    if loss_best > loss_test:
+        model_best = True
+        loss_best = loss_test
+        checkpoints.save(epoch, model, model_best)
