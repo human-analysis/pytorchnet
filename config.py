@@ -26,7 +26,7 @@ parser.add_argument('--loader-input', type=str, default=None, metavar='', help='
 parser.add_argument('--loader-label', type=str, default=None, metavar='', help='label loader')
 
 # ======================== Network Model Setings ===================================
-parser.add_argument('--channels', type=int, default=None, metavar='', help='number of input channels')
+parser.add_argument('--nchannels', type=int, default=None, metavar='', help='number of input channels')
 parser.add_argument('--resolution-high', type=int, default=None, metavar='', help='image resolution height')
 parser.add_argument('--resolution-wide', type=int, default=None, metavar='', help='image resolution width')
 parser.add_argument('--ndim', type=int, default=None, metavar='', help='number of feature dimensions')
@@ -38,6 +38,7 @@ parser.add_argument('--tau', type=float, default=None, metavar='', help='Tau')
 
 # ======================== Training Settings =======================================
 parser.add_argument('--cuda', type=bool, default=None, metavar='', help='run on gpu')
+parser.add_argument('--ngpu', type=int, default=None, metavar='', help='number of gpus to use')
 parser.add_argument('--batch-size', type=int, default=None, metavar='', help='batch size for training')
 parser.add_argument('--nepochs', type=int, default=None, metavar='', help='number of epochs to train')
 parser.add_argument('--niters', type=int, default=None, metavar='', help='number of iterations at test time')

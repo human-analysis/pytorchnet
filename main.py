@@ -19,7 +19,7 @@ checkpoints = Checkpoints(args)
 
 # Create Model
 models = Model(args)
-model, criterion = models.setup(checkpoints.latest())
+model, criterion = models.setup(checkpoints)
 
 # Data Loading
 dataloader = Dataloader(args)
