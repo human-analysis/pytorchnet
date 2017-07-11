@@ -20,3 +20,9 @@ def writetextfile(data, filename):
 def delete_file(filename):
     if os.path.isfile(filename) == True:
         os.remove(filename)
+
+def eformat(f, prec, exp_digits):
+    s = "%.*e"%(prec, f)
+    mantissa, exp = s.split('e')
+    # add 1 to digits as 1 is taken by sign +/-
+    return "%se%+0*d"%(mantissa, exp_digits+1, int(exp))
