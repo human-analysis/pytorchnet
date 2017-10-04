@@ -45,6 +45,7 @@ parser.add_argument('--niters', type=int, default=None, metavar='', help='number
 parser.add_argument('--epoch-number', type=int, default=None, metavar='', help='epoch number')
 parser.add_argument('--nthreads', type=int, default=None, metavar='', help='number of threads for data loading')
 parser.add_argument('--manual-seed', type=int, default=None, metavar='', help='manual seed for randomness')
+parser.add_argument('--port', type=int, default=None, metavar='', help='port for visualizing training at http://localhost:port')
 
 # ======================== Hyperparameter Setings ==================================
 parser.add_argument('--optim-method', type=str, default=None, metavar='', help='the optimization routine ')

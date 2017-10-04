@@ -1,5 +1,7 @@
 # monitor.py
 
+from collections import OrderedDict
+
 class Monitor:
 
     def __init__(self, smoothing=True, smoothness=0.7):
@@ -33,4 +35,4 @@ class Monitor:
         if key != None:
             return self.losses[key]
         if key == None:
-            return [self.losses[key] for key in self.keys]
+            return OrderedDict([(key,self.losses[key]) for key in self.keys])

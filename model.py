@@ -17,13 +17,14 @@ class Model:
 
     def __init__(self, args):
         self.cuda = args.cuda
-        self.dropout = args.dropout
-        self.nfilters = args.nfilters
-        self.nclasses = args.nclasses
-        self.nchannels = args.nchannels
+        # self.dropout = args.dropout
+        # self.nfilters = args.nfilters
+        # self.nclasses = args.nclasses
+        # self.nchannels = args.nchannels
 
     def setup(self, checkpoints):
-        model = models.resnet18(self.nchannels, self.nfilters, self.nclasses)
+        model = models.Net()
+        # model = models.resnet18(self.nchannels, self.nfilters, self.nclasses)
         criterion = losses.Classification()
 
         if checkpoints.latest('resume') == None:

@@ -15,8 +15,9 @@ class Trainer():
         self.model = model
         self.criterion = criterion
 
+        self.port = args.port
         self.dir_save = args.save
-        
+                
         self.cuda = args.cuda
         self.nepochs = args.nepochs
         self.nclasses = args.nclasses
@@ -41,8 +42,9 @@ class Trainer():
         else:
             raise(Exception("Unknown Optimization Method"))
 
-        self.label = torch.zeros(self.batch_size, self.nclasses)
-        self.input = torch.zeros(self.batch_size,self.channels,self.resolution_high,self.resolution_wide)
+        # for classification
+        self.label = torch.zeros(self.batch_size).long()
+        self.input = torch.zeros(self.batch_size,self.nchannels,self.resolution_high,self.resolution_wide)
 
         if args.cuda:
             self.label = self.label.cuda()
@@ -51,26 +53,52 @@ class Trainer():
         self.input = Variable(self.input)
         self.label = Variable(self.label)
         
+        # logging training 
         self.log_loss_train = plugins.Logger(args.logs, 'TrainLogger.txt')
-        self.params_loss_train = ['Loss','Acc']
+        self.params_loss_train = ['Loss','Accuracy']
         self.log_loss_train.register(self.params_loss_train)
 
+        # logging testing 
         self.log_loss_test = plugins.Logger(args.logs, 'TestLogger.txt')
-        self.params_loss_test = ['Loss','Acc']
+        self.params_loss_test = ['Loss','Accuracy']
         self.log_loss_test.register(self.params_loss_test)
 
-        self.log_monitor_train = plugins.Monitor()
-        self.params_monitor_train = ['loss','acc']
-        self.log_monitor_train.register(self.params_monitor_train)
+        # monitor training
+        self.monitor_train = plugins.Monitor()
+        self.params_monitor_train = ['Loss','Accuracy']
+        self.monitor_train.register(self.params_monitor_train)
 
-        self.log_monitor_test = plugins.Monitor()
-        self.params_monitor_test = ['loss','acc']
-        self.log_monitor_test.register(self.params_monitor_test)
+        # monitor testing
+        self.monitor_test = plugins.Monitor()
+        self.params_monitor_test = ['Loss','Accuracy']
+        self.monitor_test.register(self.params_monitor_test)
 
+        # visualize training
+        self.visualizer_train = plugins.Visualizer(self.port, 'Train')
+        self.params_visualizer_train = {
+        'Loss':{'dtype':'scalar','vtype':'plot'},
+        'Accuracy':{'dtype':'scalar','vtype':'plot'},
+        'Image':{'dtype':'image','vtype':'image'},
+        'Images':{'dtype':'images','vtype':'images'},
+        }
+        self.visualizer_train.register(self.params_visualizer_train)
+
+        # visualize testing
+        self.visualizer_test = plugins.Visualizer(self.port, 'Test')
+        self.params_visualizer_test = {
+        'Loss':{'dtype':'scalar','vtype':'plot'},
+        'Accuracy':{'dtype':'scalar','vtype':'plot'},
+        'Image':{'dtype':'image','vtype':'image'},
+        'Images':{'dtype':'images','vtype':'images'},
+        }
+        self.visualizer_test.register(self.params_visualizer_test)
+
+        # display training progress
         self.print_train = '[%d/%d][%d/%d] '
         for item in self.params_loss_train:
             self.print_train = self.print_train + item + " %.4f "
 
+        # display testing progress
         self.print_test = '[%d/%d][%d/%d] '
         for item in self.params_loss_test:
             self.print_test = self.print_test + item + " %.4f "
@@ -92,10 +120,11 @@ class Trainer():
             param_group['lr'] = lr
         return optimizer
 
+    # not sure if this is working as it should
     def model_eval(self):
         self.model.eval()
         for m in self.model.modules():
-            for i in range(len(self.evalmodules))
+            for i in range(len(self.evalmodules)):
                 if isinstance(m, self.evalmodules[i]):
                     m.train()
 
@@ -103,7 +132,7 @@ class Trainer():
         self.model.train()
         
     def train(self, epoch, dataloader):
-        self.log_monitor_train.reset()
+        self.monitor_train.reset()
         data_iter = iter(dataloader)
         self.optimizer = self.get_optimizer(epoch+1, self.optimizer)
 
@@ -134,17 +163,20 @@ class Trainer():
             # this is for classfication
             pred = output.data.max(1)[1]
             acc = pred.eq(self.label.data).cpu().sum()*100/batch_size
-            self.losses_train['acc'] = acc
-            self.losses_train['loss'] = loss.data[0]
-            self.log_monitor_train.update(self.losses_train, batch_size)
+            self.losses_train['Accuracy'] = acc
+            self.losses_train['Loss'] = loss.data[0]
+            self.monitor_train.update(self.losses_train, batch_size)
             print(self.print_train % tuple([epoch, self.nepochs, i, len(dataloader)] + [self.losses_train[key] for key in self.params_monitor_train]))
         
-        loss = self.log_monitor_train.getvalues()
+        loss = self.monitor_train.getvalues()
         self.log_loss_train.update(loss)
-        return self.log_monitor_train.getvalues('loss')
+        loss['Image'] = input[0]
+        loss['Images'] = input
+        self.visualizer_train.update(loss)
+        return self.monitor_train.getvalues('Loss')
 
     def test(self, epoch, dataloader):
-        self.log_monitor_test.reset()
+        self.monitor_test.reset()
         data_iter = iter(dataloader)
 
         # switch to eval mode
@@ -171,11 +203,14 @@ class Trainer():
             # this is for classification
             pred = output.data.max(1)[1]
             acc = pred.eq(self.label.data).cpu().sum()*100/batch_size
-            self.losses_test['acc'] = acc
-            self.losses_test['loss'] = loss.data[0]
-            self.log_monitor_test.update(self.losses_test, batch_size)
+            self.losses_test['Accuracy'] = acc
+            self.losses_test['Loss'] = loss.data[0]
+            self.monitor_test.update(self.losses_test, batch_size)
             print(self.print_test % tuple([epoch, self.nepochs, i, len(dataloader)] + [self.losses_test[key] for key in self.params_monitor_test]))
 
-        loss = self.log_monitor_test.getvalues()
+        loss = self.monitor_test.getvalues()
         self.log_loss_test.update(loss)
-        return self.log_monitor_train.getvalues('loss')
+        loss['Image'] = input[0]
+        loss['Images'] = input
+        self.visualizer_test.update(loss)
+        return self.monitor_test.getvalues('Loss')

@@ -25,7 +25,7 @@ class Logger:
     def update(self, modules):
         tmpstr = ''
         for tmp in modules:
-            tmpstr = tmpstr + '%.4f' % (tmp) + '\t'
+            tmpstr = tmpstr + '%.4f' % (modules[tmp]) + '\t'
         tmpstr = tmpstr + '\n'
         self.fid = open(self.filename, 'a')
         self.fid.write(tmpstr)
