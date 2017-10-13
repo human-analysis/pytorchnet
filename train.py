@@ -134,6 +134,10 @@ class Trainer():
     def train(self, epoch, dataloader):
         self.monitor_train.reset()
         data_iter = iter(dataloader)
+
+        self.input.volatile = False
+        self.label.volatile = False
+
         self.optimizer = self.get_optimizer(epoch+1, self.optimizer)
 
         # switch to train mode
@@ -178,6 +182,9 @@ class Trainer():
     def test(self, epoch, dataloader):
         self.monitor_test.reset()
         data_iter = iter(dataloader)
+
+        self.input.volatile = True
+        self.label.volatile = True
 
         # switch to eval mode
         self.model_eval()

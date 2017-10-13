@@ -8,11 +8,13 @@ from config import parser
 from dataloader import Dataloader
 from checkpoints import Checkpoints
 from train import Trainer
+import utils
 
 # parse the arguments
 args = parser.parse_args()
 random.seed(args.manual_seed)
 torch.manual_seed(args.manual_seed)
+utils.saveargs(args)
 
 # initialize the checkpoint class
 checkpoints = Checkpoints(args)
