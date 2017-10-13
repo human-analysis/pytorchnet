@@ -154,18 +154,18 @@ class Dataloader:
     def create(self, flag=None):
         if flag == "Train":
             dataloader_train = torch.utils.data.DataLoader(self.dataset_train, batch_size=self.args.batch_size,
-                shuffle=True, num_workers=int(self.args.nthreads))
+                shuffle=True, num_workers=int(self.args.nthreads), pin_memory=True)
             return dataloader_train
 
         if flag == "Test":
             dataloader_test = torch.utils.data.DataLoader(self.dataset_val, batch_size=self.args.batch_size,
-                shuffle=True, num_workers=int(self.args.nthreads))
+                shuffle=True, num_workers=int(self.args.nthreads), pin_memory=True)
             return dataloader_test
 
         if flag == None:
             dataloader_train = torch.utils.data.DataLoader(self.dataset_train, batch_size=self.args.batch_size,
-                shuffle=True, num_workers=int(self.args.nthreads))
+                shuffle=True, num_workers=int(self.args.nthreads), pin_memory=True)
         
             dataloader_test = torch.utils.data.DataLoader(self.dataset_val, batch_size=self.args.batch_size,
-                shuffle=True, num_workers=int(self.args.nthreads))
+                shuffle=True, num_workers=int(self.args.nthreads), pin_memory=True)
             return dataloader_train, dataloader_test
