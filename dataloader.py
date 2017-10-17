@@ -29,8 +29,8 @@ class Dataloader:
         self.input_filename_train = args.input_filename_train
         self.label_filename_train = args.label_filename_train
 
-        if self.dataset_train == 'lsun':
-            self.dataset_train = datasets.LSUN(db_path=args.dataroot, classes=['bedroom_train'],
+        if self.dataset_train == 'LSUN':
+            self.dataset_train = getattr(datasets, self.dataset_train)(db_path=args.dataroot, classes=['bedroom_train'],
                 transform=transforms.Compose([
                     transforms.Scale(self.resolution),
                     transforms.CenterCrop(self.resolution),
@@ -38,21 +38,70 @@ class Dataloader:
                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
                     ])
                 )
-        
-        elif self.dataset_train == 'cifar10':
-            self.dataset_train = datasets.CIFAR10(root=self.args.dataroot, train=True, download=True,
+
+        elif self.dataset_train == 'CIFAR10' or self.dataset_train == 'CIFAR100':
+            self.dataset_train = getattr(datasets, self.dataset_train)(root=self.args.dataroot, train=True, download=True,
                 transform=transforms.Compose([
                     transforms.Scale(self.resolution),
                     transforms.ToTensor(),
                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
                     ])
                 )
-        elif self.dataset_train == 'mnist':
-            self.dataset_train = datasets.MNIST(root=self.args.dataroot, train=True, download=True,
+
+        elif self.dataset_train == 'CocoCaption' or self.dataset_train == 'CocoDetection':
+            self.dataset_train = getattr(datasets, self.dataset_train)(root=self.args.dataroot, train=True, download=True,
+                transform=transforms.Compose([
+                    transforms.Scale(self.resolution),
+                    transforms.ToTensor(),
+                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                    ])
+                )
+
+        elif self.dataset_train == 'STL10' or self.dataset_train == 'SVHN':
+            self.dataset_train = getattr(datasets, self.dataset_train)(root=self.args.dataroot, train=True, download=True,
+                transform=transforms.Compose([
+                    transforms.Scale(self.resolution),
+                    transforms.ToTensor(),
+                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                    ])
+                )
+
+        elif self.dataset_train == 'MNIST':
+            self.dataset_train = getattr(datasets, self.dataset_train)(root=self.args.dataroot, train=True, download=True,
                 transform=transforms.Compose([
                        transforms.ToTensor(),
                        transforms.Normalize((0.1307,), (0.3081,))
                    ])
+                )
+
+        elif self.dataset_train == 'ImageNet':
+            normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225])
+            self.dataset_train = datasets.ImageFolder(root=self.args.dataroot+self.args.input_filename_train,
+                transform=transforms.Compose([
+                    transforms.RandomSizedCrop(224),
+                    transforms.RandomHorizontalFlip(),
+                    transforms.ToTensor(),
+                    normalize,
+                   ])
+                )
+
+        elif self.dataset_train == 'FRGC':
+            self.dataset_train = datasets.ImageFolder(root=self.args.dataroot+self.args.input_filename_train,
+                transform=transforms.Compose([
+                    transforms.Scale(self.resolution),
+                    transforms.ToTensor(),
+                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                   ])
+                )
+
+        elif self.dataset_train == 'folder':
+            self.dataset_train = datasets.ImageFolder(root=self.args.dataroot+self.args.input_filename_train,
+                transform=transforms.Compose([
+                    transforms.Scale(self.resolution),
+                    transforms.ToTensor(),
+                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                    ])
                 )
 
         elif self.dataset_train == 'filelist':
@@ -96,8 +145,8 @@ class Dataloader:
         else:
             raise(Exception("Unknown Dataset"))
 
-        if self.dataset_test == 'lsun':
-            self.dataset_val = datasets.LSUN(db_path=args.dataroot, classes=['bedroom_val'],
+        if self.dataset_test == 'LSUN':
+            self.dataset_val = getattr(datasets, self.dataset_train)(db_path=args.dataroot, classes=['bedroom_val'],
                 transform=transforms.Compose([
                     transforms.Scale(self.resolution),
                     transforms.CenterCrop(self.resolution),
@@ -106,24 +155,73 @@ class Dataloader:
                     ])
                 )
         
-        elif self.dataset_test == 'cifar10':
-            self.dataset_val = datasets.CIFAR10(root=self.args.dataroot, train=False, download=True,
+        elif self.dataset_test == 'CIFAR10' or self.dataset_test == 'CIFAR100':
+            self.dataset_val = getattr(datasets, self.dataset_train)(root=self.args.dataroot, train=False, download=True,
                 transform=transforms.Compose([
                     transforms.Scale(self.resolution),
                     transforms.ToTensor(),
                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
                     ])
                 )
-        elif self.dataset_test == 'mnist':
-            self.dataset_val = datasets.MNIST(root=self.args.dataroot, train=False, download=True, 
+
+        elif self.dataset_test == 'CocoCaption' or self.dataset_test == 'CocoDetection':
+            self.dataset_val = getattr(datasets, self.dataset_train)(root=self.args.dataroot, train=False, download=True,
+                transform=transforms.Compose([
+                    transforms.Scale(self.resolution),
+                    transforms.ToTensor(),
+                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                    ])
+                )
+
+        elif self.dataset_test == 'STL10' or self.dataset_test == 'SVHN':
+            self.dataset_val = getattr(datasets, self.dataset_train)(root=self.args.dataroot, train=False, download=True,
+                transform=transforms.Compose([
+                    transforms.Scale(self.resolution),
+                    transforms.ToTensor(),
+                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                    ])
+                )
+
+        elif self.dataset_test == 'MNIST':
+            self.dataset_val = getattr(datasets, self.dataset_train)(root=self.args.dataroot, train=False, download=True, 
                 transform=transforms.Compose([
                        transforms.ToTensor(),
                        transforms.Normalize((0.1307,), (0.3081,))
                    ])
                 )
 
+        elif self.dataset_test == 'ImageNet':
+            normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225])
+            self.dataset_val = datasets.ImageFolder(root=self.args.dataroot+self.args.input_filename_test,
+                transform=transforms.Compose([
+                    transforms.Scale(256),
+                    transforms.CenterCrop(224),
+                    transforms.ToTensor(),
+                    normalize,
+                   ])
+                )
+
+        elif self.dataset_test == 'FRGC':
+            self.dataset_val = datasets.ImageFolder(root=self.args.dataroot+self.args.input_filename_test,
+                transform=transforms.Compose([
+                    transforms.Scale(self.resolution),
+                    transforms.ToTensor(),
+                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                   ])
+                )
+
+        elif self.dataset_test == 'folder':
+            self.dataset_val = datasets.ImageFolder(root=self.args.dataroot+self.args.input_filename_test,
+                transform=transforms.Compose([
+                    transforms.Scale(self.resolution),
+                    transforms.ToTensor(),
+                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                    ])
+                )
+
         elif self.dataset_test == 'filelist':
-            self.dataset_test = datasets.FileList(self.input_filename_test, self.label_filename_test, self.split_train,
+            self.dataset_val = datasets.FileList(self.input_filename_test, self.label_filename_test, self.split_train,
                 self.split_test, train=True,
                 transform_train=transforms.Compose([
                     transforms.Scale(self.resolution),
@@ -136,7 +234,7 @@ class Dataloader:
                 )
 
         elif self.dataset_test == 'folderlist':
-            self.dataset_test = datasets.FileList(self.input_filename_test, self.label_filename_test, self.split_train,
+            self.dataset_val = datasets.FileList(self.input_filename_test, self.label_filename_test, self.split_train,
                 self.split_test, train=True,
                 transform_train=transforms.Compose([
                     transforms.Scale(self.resolution),
