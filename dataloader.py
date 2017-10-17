@@ -95,7 +95,7 @@ class Dataloader:
                    ])
                 )
 
-        elif self.dataset_train == 'folder':
+        elif self.dataset_train == 'Folder':
             self.dataset_train = datasets.ImageFolder(root=self.args.dataroot+self.args.input_filename_train,
                 transform=transforms.Compose([
                     transforms.Scale(self.resolution),
@@ -104,7 +104,7 @@ class Dataloader:
                     ])
                 )
 
-        elif self.dataset_train == 'filelist':
+        elif self.dataset_train == 'FileList':
             self.dataset_train = datasets.FileList(self.input_filename_train, self.label_filename_train, self.split_train,
                 self.split_test, train=True,
                 transform_train=transforms.Compose([
@@ -123,7 +123,7 @@ class Dataloader:
                 loader_label=self.loader_label,
                 )
 
-        elif self.dataset_train == 'folderlist':
+        elif self.dataset_train == 'FolderList':
             self.dataset_train = datasets.FileList(self.input_filename_train, self.label_filename_train, self.split_train,
                 self.split_test, train=True,
                 transform_train=transforms.Compose([
@@ -211,7 +211,7 @@ class Dataloader:
                    ])
                 )
 
-        elif self.dataset_test == 'folder':
+        elif self.dataset_test == 'Folder':
             self.dataset_val = datasets.ImageFolder(root=self.args.dataroot+self.args.input_filename_test,
                 transform=transforms.Compose([
                     transforms.Scale(self.resolution),
@@ -220,7 +220,7 @@ class Dataloader:
                     ])
                 )
 
-        elif self.dataset_test == 'filelist':
+        elif self.dataset_test == 'FileList':
             self.dataset_val = datasets.FileList(self.input_filename_test, self.label_filename_test, self.split_train,
                 self.split_test, train=True,
                 transform_train=transforms.Compose([
@@ -233,7 +233,7 @@ class Dataloader:
                 loader_label=self.loader_label,
                 )
 
-        elif self.dataset_test == 'folderlist':
+        elif self.dataset_test == 'FolderList':
             self.dataset_val = datasets.FileList(self.input_filename_test, self.label_filename_test, self.split_train,
                 self.split_test, train=True,
                 transform_train=transforms.Compose([
