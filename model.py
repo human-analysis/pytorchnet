@@ -1,9 +1,10 @@
 # model.py
 
 import math
-from torch import nn
 import models
 import losses
+from torch import nn
+
 
 def weights_init(m):
     if isinstance(m, nn.Conv2d):
@@ -13,28 +14,34 @@ def weights_init(m):
         m.weight.data.fill_(1)
         m.bias.data.zero_()
 
+
 class Model:
 
     def __init__(self, args):
+        self.ngpu = args.ngpu
         self.cuda = args.cuda
-        # self.dropout = args.dropout
-        # self.nfilters = args.nfilters
-        # self.nclasses = args.nclasses
-        # self.nchannels = args.nchannels
+        self.nclasses = args.nclasses
+        self.nfilters = args.nfilters
+        self.nchannels = args.nchannels
+        self.net_type = args.net_type
 
     def setup(self, checkpoints):
-        model = models.Net()
-        # model = models.resnet18(self.nchannels, self.nfilters, self.nclasses)
+        model = getattr(models, self.net_type)(
+            nchannels=self.nchannels,
+            nfilters=self.nfilters,
+            nclasses=self.nclasses,
+        )
         criterion = losses.Classification()
 
-        if checkpoints.latest('resume') == None:
+        if self.cuda:
+            model = nn.DataParallel(model, device_ids=list(range(self.ngpu)))
+            model = model.cuda()
+            criterion = criterion.cuda()
+
+        if checkpoints.latest('resume') is None:
             model.apply(weights_init)
         else:
             tmp = checkpoints.load(checkpoints['resume'])
             model.load_state_dict(tmp)
-
-        if self.cuda:
-            model = model.cuda()
-            criterion = criterion.cuda()
 
         return model, criterion

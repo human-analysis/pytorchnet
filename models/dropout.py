@@ -1,8 +1,8 @@
-import torch
-from torch.autograd.function import InplaceFunction
-from itertools import repeat
+# dropout.py
+
 from torch.nn.modules import Module
-from torch.autograd import Variable
+from torch.autograd.function import InplaceFunction
+
 
 class Dropout(InplaceFunction):
 
@@ -44,6 +44,7 @@ class Dropout(InplaceFunction):
 def f_dropout(input, p):
     return Dropout(p)(input)
 
+
 class MyDropout(Module):
     def __init__(self, p=0.5, inplace=False):
         super(MyDropout, self).__init__()
@@ -55,7 +56,7 @@ class MyDropout(Module):
         self.dropout = Dropout(self.p, self.inplace)
 
     def forward(self, input):
-        return f_dropout(input,self.p)
+        return f_dropout(input, self.p)
 
     def __repr__(self):
         inplace_str = ', inplace' if self.inplace else ''

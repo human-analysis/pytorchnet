@@ -2,43 +2,52 @@
 
 import torch
 import random
-import torchvision
+
+import utils
 from model import Model
+from test import Tester
+from train import Trainer
 from config import parser
 from dataloader import Dataloader
 from checkpoints import Checkpoints
-from train import Trainer
-import utils
 
-# parse the arguments
-args = parser.parse_args()
-random.seed(args.manual_seed)
-torch.manual_seed(args.manual_seed)
-utils.saveargs(args)
 
-# initialize the checkpoint class
-checkpoints = Checkpoints(args)
+def main():
+    # parse the arguments
+    args = parser.parse_args()
+    random.seed(args.manual_seed)
+    torch.manual_seed(args.manual_seed)
+    utils.saveargs(args)
 
-# Create Model
-models = Model(args)
-model, criterion = models.setup(checkpoints)
+    # initialize the checkpoint class
+    checkpoints = Checkpoints(args)
 
-# Data Loading
-dataloader = Dataloader(args)
-loader_train, loader_test = dataloader.create()
+    # Create Model
+    models = Model(args)
+    model, criterion = models.setup(checkpoints)
 
-# The trainer handles the training loop and evaluation on validation set
-trainer = Trainer(args, model, criterion)
+    # Data Loading
+    dataloader = Dataloader(args)
+    loaders = dataloader.create()
 
-# start training !!!
-loss_best = 1e10
-for epoch in range(args.nepochs):
+    # The trainer handles the training loop
+    trainer = Trainer(args, model, criterion)
+    # The trainer handles the evaluation on validation set
+    tester = Tester(args, model, criterion)
 
-    # train for a single epoch
-    loss_train = trainer.train(epoch, loader_train)
-    loss_test = trainer.test(epoch, loader_test)
+    # start training !!!
+    loss_best = 1e10
+    for epoch in range(args.nepochs):
 
-    if loss_best > loss_test:
-        model_best = True
-        loss_best = loss_test
-        checkpoints.save(epoch, model, model_best)
+        # train for a single epoch
+        loss_train = trainer.train(epoch, loaders)
+        loss_test = tester.test(epoch, loaders)
+
+        if loss_best > loss_test:
+            model_best = True
+            loss_best = loss_test
+            checkpoints.save(epoch, model, model_best)
+
+
+if __name__ == "__main__":
+    main()

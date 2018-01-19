@@ -1,9 +1,7 @@
 # classification.py
 
-import torch
 
 class Classification():
-
     def __init__(self, topk=(1,)):
         self.topk = topk
 

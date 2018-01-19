@@ -2,11 +2,11 @@
 
 import os
 
-class Logger:
 
+class Logger:
     def __init__(self, path, filename):
         self.num = 0
-        if os.path.isdir(path) == False:
+        if os.path.isdir(path) is False:
             os.makedirs(path)
         self.filename = os.path.join(path, filename)
         self.fid = open(self.filename, 'w')

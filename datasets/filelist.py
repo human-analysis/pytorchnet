@@ -1,17 +1,17 @@
 # filelist.py
 
-import torch
-import numpy as np
+import os
+import math
 import utils as utils
 import torch.utils.data as data
 from sklearn.utils import shuffle
 import datasets.loaders as loaders
-import torchvision.transforms as transforms
 
-class FileList(data.Dataset):
+
+class FileListLoader(data.Dataset):
     def __init__(self, ifile, lfile=None, split_train=1.0, split_test=0.0, train=True, 
-        transform_train=None, transform_test=None, loader_input=loaders.loader_image, loader_label=loaders.loader_torch):
-            
+        transform_train=None, transform_test=None, loader_input='image', loader_label='torch'):
+
         self.ifile = ifile
         self.lfile = lfile
         self.train = train
@@ -19,9 +19,6 @@ class FileList(data.Dataset):
         self.split_train = split_train
         self.transform_test = transform_test
         self.transform_train = transform_train
-
-        self.loader_input = loader_input
-        self.loader_label = loader_label
 
         if loader_input == 'image':
             self.loader_input = loaders.loader_image
@@ -37,20 +34,20 @@ class FileList(data.Dataset):
         if loader_label == 'numpy':
             self.loader_label = loaders.loader_numpy
 
-        if ifile != None:
+        if ifile is not None:
             imagelist = utils.readtextfile(ifile)
             imagelist = [x.rstrip('\n') for x in imagelist]
         else:
             imagelist = []
 
-        if lfile != None:
+        if lfile is not None:
             labellist = utils.readtextfile(lfile)
             labellist = [x.rstrip('\n') for x in labellist]
         else:
             labellist = []
 
         if len(imagelist) == len(labellist):
-                shuffle(imagelist, labellist)
+            shuffle(imagelist, labellist)
 
         if len(imagelist) > 0 and len(labellist) == 0:
             shuffle(imagelist)
@@ -60,62 +57,77 @@ class FileList(data.Dataset):
 
         if (self.split_train < 1.0) & (self.split_train > 0.0):
             if len(imagelist) > 0:
-                num = math.floor(self.split*len(imagelist))
+                num = math.floor(self.split_train * len(imagelist))
                 self.images_train = imagelist[0:num]
-                self.images_test = images[num+1:len(imagelist)]
+                self.images_test = imagelist[num + 1:len(imagelist)]
+            else:
+                self.images_test = []
+                self.images_train = []
+
             if len(labellist) > 0:
-                num = math.floor(self.split*len(labellist))
+                num = math.floor(self.split * len(labellist))
                 self.labels_train = labellist[0:num]
-                self.labels_test = labellist[num+1:len(labellist)]
+                self.labels_test = labellist[num + 1:len(labellist)]
+            else:
+                self.labels_test = []
+                self.labels_train = []
 
         elif self.split_train == 1.0:
             if len(imagelist) > 0:
                 self.images_train = imagelist
+            else:
+                self.images_train = []
             if len(labellist) > 0:
                 self.labels_train = labellist
+            else:
+                self.labels_train = []
 
         elif self.split_test == 1.0:
             if len(imagelist) > 0:
                 self.images_test = imagelist
+            else:
+                self.images_test = []
             if len(labellist) > 0:
                 self.labels_test = labellist
+            else:
+                self.labels_test = []
 
     def __len__(self):
-        if self.train == True:
+        if self.train is True:
             return len(self.images_train)
-        if self.train == False:
+        if self.train is False:
             return len(self.images_test)
 
     def __getitem__(self, index):
-        input = {}      
-        if self.train == True:
+        if self.train is True:
             if len(self.images_train) > 0:
                 path = self.images_train[index]
-                input['inp'] = self.loader_input(path)
+                image = self.loader_input(path)
+            else:
+                image = []
 
             if len(self.labels_train) > 0:
-                path = self.labels_train[index]
-                input['tgt'] = self.loader_label(path)
+                label = self.labels_train[index]
+            else:
+                label = []
 
             if self.transform_train is not None:
-                input = self.transform_train(input)
+                image = self.transform_train(image)
 
-            image = input['inp']
-            label = input['tgt']
-
-        if self.train == False:
+        if self.train is False:
             if len(self.images_test) > 0:
                 path = self.images_test[index]
-                input['inp'] = self.loader_input(path)
+                image = self.loader_input(path)
+            else:
+                image = []
 
             if len(self.labels_test) > 0:
-                path = self.labels_test[index]
-                input['tgt'] = self.loader_label(path)
+                label = self.labels_test[index]
+            else:
+                label = []
 
             if self.transform_test is not None:
-                input = self.transform_test(input)
+                image = self.transform_test(image)
 
-            image = input['inp']
-            label = input['tgt']
-
-        return image, label
+            path = os.path.basename(path)
+        return image, label, path
