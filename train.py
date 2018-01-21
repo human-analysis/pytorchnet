@@ -128,8 +128,8 @@ class Trainer():
             self.input.data.resize_(input.size()).copy_(input)
             self.label.data.resize_(label.size()).copy_(label)
 
-            output = self.model.forward(self.input)
-            loss = self.criterion.forward(output, self.label)
+            output = self.model(self.input)
+            loss = self.criterion(output, self.label)
 
             self.optimizer.zero_grad()
             loss.backward()

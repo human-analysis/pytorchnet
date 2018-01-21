@@ -61,7 +61,6 @@ class Tester():
 
         self.evalmodules = []
         self.losses_test = {}
-        print(self.model)
 
     # not sure if this is working as it should
     def model_eval(self):
