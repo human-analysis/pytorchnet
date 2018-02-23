@@ -1,11 +1,13 @@
 # classification.py
 
+__all__ = ['Classification', 'Top1Classification']
 
-class Classification():
+
+class Classification:
     def __init__(self, topk=(1,)):
         self.topk = topk
 
-    def forward(self, output, target):
+    def __call__(self, output, target):
         """Computes the precision@k for the specified values of k"""
         maxk = max(self.topk)
         batch_size = target.size(0)
@@ -18,4 +20,17 @@ class Classification():
         for k in self.topk:
             correct_k = correct[:k].view(-1).float().sum(0)
             res.append(correct_k.mul_(100.0 / batch_size))
+        return res
+
+
+class Top1Classification:
+    def __init__(self):
+        pass
+
+    def __call__(self, output, target):
+        batch_size = target.size(0)
+
+        pred = output.data.max(1)[1]
+        res = pred.eq(target.data).cpu().sum() * 100 / batch_size
+
         return res
