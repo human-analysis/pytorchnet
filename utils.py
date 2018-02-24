@@ -99,7 +99,8 @@ def saveargs(args: object) -> object:
                                                  'save_results', 'result_path',
                                                  'config_file']:
             continue
-        elif par in ('model_options', 'dataset_options'):
+        elif par in ('model_options', 'loss_options', 'evaluation_options',
+                     'dataset_options'):
             varargs += '%s = %s\n' % (par, json.dumps(getattr(args, par)))
         else:
             varargs += '%s = %s\n' % (par, getattr(args, par))

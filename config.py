@@ -47,11 +47,11 @@ def parse_args():
 
     # ======================= Network Model Setings ============================
     parser.add_argument('--model-type', type=str, default=None, help='type of network')
-    parser.add_argument('--model-options', type=json.loads, default=None, metavar='', help='additional model-specific parameters, i.e. \'{"nstack": 1}\'')
+    parser.add_argument('--model-options', type=json.loads, default={}, metavar='', help='additional model-specific parameters, i.e. \'{"nstack": 1}\'')
     parser.add_argument('--loss-type', type=str, default=None, help='loss method')
-    parser.add_argument('--loss-options', type=json.loads, default=None, metavar='', help='loss-specific parameters, i.e. \'{"wsigma": 1}\'')
+    parser.add_argument('--loss-options', type=json.loads, default={}, metavar='', help='loss-specific parameters, i.e. \'{"wsigma": 1}\'')
     parser.add_argument('--evaluation-type', type=str, default=None, help='evaluation method')
-    parser.add_argument('--evaluation-options', type=json.loads, default=None, metavar='', help='evaluation-specific parameters, i.e. \'{"topk": 1}\'')
+    parser.add_argument('--evaluation-options', type=json.loads, default={}, metavar='', help='evaluation-specific parameters, i.e. \'{"topk": 1}\'')
     parser.add_argument('--resolution-high', type=int, default=None, help='image resolution height')
     parser.add_argument('--resolution-wide', type=int, default=None, help='image resolution width')
     parser.add_argument('--ndim', type=int, default=None, help='number of feature dimensions')
@@ -76,6 +76,7 @@ def parse_args():
 
     # ======================= Hyperparameter Setings ===========================
     parser.add_argument('--optim-method', type=str, default=None, help='the optimization routine ')
+    parser.add_argument('--optim-options', type=json.loads, default={}, metavar='', help='optimizer-specific parameters, i.e. \'{"lr": 0.001}\'')
     parser.add_argument('--learning-rate', type=float, default=None, help='learning rate')
     parser.add_argument('--learning-rate-decay', type=float, default=None, help='learning rate decay')
     parser.add_argument('--momentum', type=float, default=None, help='momentum')
@@ -84,7 +85,7 @@ def parse_args():
     parser.add_argument('--adam-beta2', type=float, default=None, help='Beta 2 parameter for Adam')
 
     # ======================== Main Setings ====================================
-    parser.add_argument('--same-visdom-env', type=utils.str2bool, default='No', metavar='', help='does not add date and time to the visdom environment name')
+    parser.add_argument('--same-env', type=utils.str2bool, default='No', metavar='', help='does not add date and time to the visdom environment name')
     parser.add_argument('-s', '--save', '--save-results', type=utils.str2bool, dest="save_results", default='No', metavar='', help='save the arguments and the results')
 
     if os.path.exists(args.config_file):
@@ -98,7 +99,7 @@ def parse_args():
     # add date and time to the name of Visdom environment and the result
     if args.env is '':
         args.env = args.model_type
-    if not args.same_visdom_env:
+    if not args.same_env:
         args.env += '_' + now
     args.result_path = result_path
 

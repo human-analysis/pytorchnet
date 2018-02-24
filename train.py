@@ -117,7 +117,6 @@ class Trainer:
     def train(self, epoch, dataloader):
         dataloader = dataloader['train']
         self.monitor.reset()
-        data_iter = iter(dataloader)
         self.optimizer = self.get_optimizer(epoch + 1, self.optimizer)
 
         # switch to train mode
@@ -158,7 +157,7 @@ class Trainer:
             batch_time = time.time() - end
             processed_data_len += len(inputs)
 
-            bar.suffix = '323'+self.print_formatter.format(
+            bar.suffix = self.print_formatter.format(
                 *[processed_data_len, len(dataloader.sampler), data_time,
                   batch_time, bar.elapsed_td, bar.eta_td] +
                  [self.losses[key] for key in self.params_monitor] +
