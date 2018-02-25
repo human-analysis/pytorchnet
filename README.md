@@ -54,3 +54,27 @@ PyTorchNet comes with a classification example in which a [ResNet](https://arxiv
 ![screenshot from 2018-02-24 18-53-13](https://user-images.githubusercontent.com/24301047/36636539-abe73688-1996-11e8-83ea-c43318f24048.png)
 
 ![screenshot from 2018-02-24 18-58-03](https://user-images.githubusercontent.com/24301047/36636483-05f60038-1996-11e8-806e-895638396986.png)
+# Configuration
+PyTorchNet loads its parameters at the beginning via a config file and/or the command line.
+## Config file
+When PyTorchNet is being run, it will automatically load all parameters from [args.txt](https://github.com/human-analysis/pytorchnet/blob/master/args.txt) by default, if it exists. In order to load a custom config file, the following parameter can be used:
+> python main.py --config custom_args.txt
+### args.txt
+> [Arguments]
+>  
+> port = 8097
+> env = main
+> same_env = Yes
+> log_type = traditional
+> save_results = No
+>  
+> # dataset options
+> dataroot = ./data
+> dataset_train = CIFAR10
+> dataset_test = CIFAR10
+> batch_size = 64
+
+## Command line
+Parameters can also be set in the command line when invoking [main.py](https://github.com/human-analysis/pytorchnet/blob/master/main.py). These parameters will precede the existing parameters in the configuration file.
+> python [main.py](https://github.com/human-analysis/pytorchnet/blob/master/main.py) --log-type progressbar
+
