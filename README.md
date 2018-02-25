@@ -42,6 +42,8 @@ Congratulations!!! You are now ready to use PyTorchNet!
 Before running PyTorchNet, [Visdom](https://github.com/facebookresearch/visdom#usage) must be up and running. This can be done by:
 > python -m visdom.server -p 8097
 
+![screenshot from 2018-02-24 19-10-44](https://user-images.githubusercontent.com/24301047/36636554-1474092e-1997-11e8-8faa-cb4ee1fe9a85.png)
+
 PyTorchNet comes with a classification example in which a [ResNet](https://arxiv.org/abs/1512.03385) model is trained for the [CIFAR10](https://www.cs.toronto.edu/~kriz/cifar.html) dataset.
 > python [main.py](https://github.com/human-analysis/pytorchnet/blob/dev/main.py)
 
