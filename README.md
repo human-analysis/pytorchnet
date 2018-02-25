@@ -36,6 +36,8 @@ First, you need to download PyTorchNet by calling the following command:
 Since PyTorchNet relies on several Python packages, you need to make sure that the requirements exist by executing the following command in the *pytorchnet* directory:
 > pip install -r requirements.txt
 
+## Pytorch
+If you do not have Pytorch or it does not meet the requirements, please follow the instruction on [the Pytorch website](http://pytorch.org/#pip-install-pytorch). 
 Congratulations!!! You are now ready to use PyTorchNet!
 
 # Usage
