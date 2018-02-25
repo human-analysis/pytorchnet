@@ -68,7 +68,7 @@ When PyTorchNet is being run, it will automatically load all parameters from [ar
 > log_type = traditional
 > save_results = No
 >  
-> # dataset options
+> \# dataset options
 > dataroot = ./data
 > dataset_train = CIFAR10
 > dataset_test = CIFAR10
