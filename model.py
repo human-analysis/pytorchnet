@@ -3,6 +3,7 @@
 import math
 import models
 import losses
+import evaluate
 from torch import nn
 
 
@@ -16,22 +17,20 @@ def weights_init(m):
 
 
 class Model:
-
     def __init__(self, args):
         self.ngpu = args.ngpu
         self.cuda = args.cuda
-        self.nclasses = args.nclasses
-        self.nfilters = args.nfilters
-        self.nchannels = args.nchannels
-        self.net_type = args.net_type
+        self.model_type = args.model_type
+        self.model_options = args.model_options
+        self.loss_type = args.loss_type
+        self.loss_options = args.loss_options
+        self.evaluation_type = args.evaluation_type
+        self.evaluation_options = args.evaluation_options
 
     def setup(self, checkpoints):
-        model = getattr(models, self.net_type)(
-            nchannels=self.nchannels,
-            nfilters=self.nfilters,
-            nclasses=self.nclasses,
-        )
-        criterion = losses.Classification()
+        model = getattr(models, self.model_type)(**self.model_options)
+        criterion = getattr(losses, self.loss_type)(**self.loss_options)
+        evaluation = getattr(evaluate, self.evaluation_type)(**self.evaluation_options)
 
         if self.cuda:
             model = nn.DataParallel(model, device_ids=list(range(self.ngpu)))
@@ -39,9 +38,9 @@ class Model:
             criterion = criterion.cuda()
 
         if checkpoints.latest('resume') is None:
-            model.apply(weights_init)
+            pass
+            # model.apply(weights_init)
         else:
-            tmp = checkpoints.load(checkpoints['resume'])
-            model.load_state_dict(tmp)
+            model.load_state_dict(checkpoints.load(checkpoints.latest('resume')))
 
-        return model, criterion
+        return model, criterion, evaluation

@@ -2,6 +2,10 @@
 
 import torch
 import torch.nn as nn
+from utils import _debuginfo
+
+
+__all__ = ['HourGlass']
 
 
 def conv3x3(in_planes, out_planes, stride=1):
@@ -14,12 +18,14 @@ class Lin(nn.Module):
         super(Lin, self).__init__()
         self.conv = nn.Conv2d(nin, nout, kernel_size=1, stride=1, padding=0)
         self.bnorm = nn.BatchNorm2d(nout)
-        self.lrelu = nn.LeakyReLU(0.2, inplace=False)
+        self.relu = nn.ReLU(inplace=False)
+        # self.lrelu = nn.LeakyReLU(0.2, inplace=False)
 
     def forward(self, inp):
         inp = self.conv(inp)
         inp = self.bnorm(inp)
-        inp = self.lrelu(inp)
+        inp = self.relu(inp)
+        # inp = self.lrelu(inp)
         return inp
 
 
@@ -40,6 +46,7 @@ class Residual(nn.Module):
         self.relu2 = nn.LeakyReLU(0.2, inplace=False)
 
     def forward(self, x):
+
         residual = x
 
         out = self.conv1(x)
@@ -123,7 +130,6 @@ class HourGlassStack(nn.Module):
         return nn.Sequential(*modules)
 
     def forward(self, inp):
-        inp = inp[0]
         ll = self.layers(inp)
         tmpout = self.output(ll)
 
@@ -164,15 +170,16 @@ class HourGlassSingle(nn.Module):
 
     """ This is the appearance model based on the hourglass model. """
 
-    def __init__(self, nfilters, nstack, noutputs, nmodules=1):
+    def __init__(self, nchannels, nfilters, nstack, noutputs, nmodules=1):
         super(HourGlassSingle, self).__init__()
 
+        self.nchannels = nchannels
         self.nstack = nstack
         self.nfilters = nfilters
         self.noutputs = noutputs
         self.nmodules = nmodules
 
-        self.conv1 = nn.Conv2d(3, self.nfilters, kernel_size=7, stride=2, padding=3)
+        self.conv1 = nn.Conv2d(self.nchannels,self.nfilters,kernel_size=7,stride=2,padding=3)
         self.bn1 = nn.BatchNorm2d(self.nfilters)
         self.relu = nn.LeakyReLU(0.2, inplace=False)
         self.r1 = Residual(self.nfilters, self.nfilters)
@@ -191,7 +198,6 @@ class HourGlassSingle(nn.Module):
         return nn.Sequential(*modules)
 
     def forward(self, inp):
-
         tmp = self.conv1(inp)
         tmp = self.bn1(tmp)
         tmp = self.relu(tmp)
@@ -199,12 +205,11 @@ class HourGlassSingle(nn.Module):
         tmp = self.pool(tmp)
         tmp = self.r2(tmp)
         tmp = self.r3(tmp)
-
         inp = []
         inp.append(tmp)
         out = []
         for name, module in self.stack_hg._modules.items():
-            inp = module(inp)
+            inp = module(inp[0])
             out.append(inp[1])
 
         out.append(self.last_hg(inp[0]))
@@ -215,15 +220,16 @@ class HourGlass(nn.Module):
 
     """ This is the appearance model based on the hourglass model. """
 
-    def __init__(self, nfilters, nstack, noutputs, nmodules=1, ngpu=1):
+    def __init__(self, nchannels, nfilters, nstack, noutputs, nmodules=1, ngpu=1):
         super(HourGlass, self).__init__()
 
         self.ngpu = ngpu
         self.nstack = nstack
+        self.nchannels = nchannels
         self.nfilters = nfilters
         self.noutputs = noutputs
         self.nmodules = nmodules
-        self.main = HourGlassSingle(self.nfilters, self.nstack, self.noutputs, self.nmodules)
+        self.main = HourGlassSingle(self.nchannels, self.nfilters, self.nstack, self.noutputs, self.nmodules)
 
     def forward(self, input):
         gpu_ids = None

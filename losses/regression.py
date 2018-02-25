@@ -1,7 +1,9 @@
 # regression.py
 
-import torch
 from torch import nn
+
+__all__ = ['Regression']
+
 
 class Regression(nn.Module):
 
@@ -9,7 +11,7 @@ class Regression(nn.Module):
         super(Regression, self).__init__()
         self.loss = nn.MSELoss()
 
-    def forward(self, input, target):
-        loss = self.loss.forward(input, target)
+    def __call__(self, inputs, target):
+        loss = self.loss.forward(inputs, target)
 
         return loss

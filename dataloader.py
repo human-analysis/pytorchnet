@@ -4,6 +4,7 @@ import torch
 import datasets
 import torch.utils.data
 import torchvision.transforms as transforms
+from torch.utils.data.sampler import SubsetRandomSampler
 
 
 class Dataloader:
@@ -13,10 +14,16 @@ class Dataloader:
         self.loader_input = args.loader_input
         self.loader_label = args.loader_label
 
+        self.dataset_options = args.dataset_options
+
         self.split_test = args.split_test
         self.split_train = args.split_train
         self.dataset_test_name = args.dataset_test
         self.dataset_train_name = args.dataset_train
+
+        self.train_dev_percent = args.train_dev_percent
+        self.test_dev_percent = args.test_dev_percent
+
         self.resolution = (args.resolution_wide, args.resolution_high)
 
         self.input_filename_test = args.input_filename_test
@@ -268,6 +275,7 @@ class Dataloader:
         else:
             raise(Exception("Unknown Dataset"))
 
+
     def create(self, flag=None):
         dataloader = {}
         if flag == "Train":
@@ -279,7 +287,7 @@ class Dataloader:
             )
             return dataloader
 
-        if flag == "Test":
+        elif flag == "Test":
             dataloader['test'] = torch.utils.data.DataLoader(
                 self.dataset_test,
                 batch_size=self.args.batch_size,
@@ -288,7 +296,7 @@ class Dataloader:
             )
             return dataloader
 
-        if flag is None:
+        elif flag is None:
             dataloader['train'] = torch.utils.data.DataLoader(
                 self.dataset_train,
                 batch_size=self.args.batch_size,
@@ -302,3 +310,47 @@ class Dataloader:
                 num_workers=int(self.args.nthreads),
                 shuffle=False, pin_memory=True)
             return dataloader
+
+    def create_devsets(self, flag=None):
+        dataloader = {}
+        if flag is None or flag == "train":
+            train_len = len(self.dataset_train)
+            train_cut_index = int(train_len * self.train_dev_percent)
+            train_random_indices = list(torch.randperm(train_len))
+            train_indices = train_random_indices[train_cut_index:]
+            train_dev_indices = train_random_indices[:train_cut_index]
+
+            train_sampler = SubsetRandomSampler(train_indices)
+            train_dev_sampler = SubsetRandomSampler(train_dev_indices)
+
+            dataloader['train'] = torch.utils.data.DataLoader(
+                    self.dataset_train, batch_size=self.args.batch_size,
+                    sampler=train_sampler, num_workers=self.args.nthreads,
+                    pin_memory=True)
+
+            dataloader['train_dev'] = torch.utils.data.DataLoader(
+                    self.dataset_train, batch_size=self.args.batch_size,
+                    sampler=train_dev_sampler, num_workers=self.args.nthreads,
+                    pin_memory=True)
+
+        if flag is None or flag == "test":
+            test_len = len(self.dataset_test)
+            test_cut_index = int(test_len * self.test_dev_percent)
+            test_random_indices = list(torch.randperm(test_len))
+            test_indices = test_random_indices[test_cut_index:]
+            test_dev_indices = test_random_indices[:test_cut_index]
+
+            test_sampler = SubsetRandomSampler(test_indices)
+            test_dev_sampler = SubsetRandomSampler(test_dev_indices)
+
+            dataloader['test_dev'] = torch.utils.data.DataLoader(
+                    self.dataset_test, batch_size=self.args.batch_size,
+                    sampler=test_dev_sampler, num_workers=self.args.nthreads,
+                    pin_memory=True)
+
+            dataloader['test'] = torch.utils.data.DataLoader(
+                    self.dataset_test, batch_size=self.args.batch_size,
+                    sampler=test_sampler, num_workers=self.args.nthreads,
+                    pin_memory=True)
+
+        return dataloader

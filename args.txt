@@ -1,0 +1,49 @@
+[Arguments]
+
+port = 8097
+env = resnet18_cifar10
+same_env = Yes
+save_results = No
+
+# dataset options
+dataroot = ./data
+# dataset_options = {"prefetch": "Yes"}
+
+dataset_train = CIFAR10
+input_filename_train = ./train_input
+label_filename_train = ./train_label
+
+dataset_test = CIFAR10
+input_filename_test = ./test_input
+label_filename_test = ./test_label
+
+# train_dev_percent = 0.10
+# test_dev_percent = 0.10
+
+batch_size = 64
+
+# model options
+model_type = resnet18
+model_options = {"nchannels": 3, "nfilters": 64, "nclasses": 10}
+loss_type = Classification
+loss_options = {}
+evaluation_type = Top1Classification
+evaluation_options = {}
+
+resolution_high = 32
+resolution_wide = 32
+
+manual_seed = 0
+nepochs = 100
+
+optim_method = Adam
+learning_rate = 3e-4
+momentum = 0.9
+weight_decay = 0.0
+adam_beta1 = 0.9
+adam_beta2 = 0.999
+
+# cpu/gpu settings
+cuda = True
+ngpu = 1
+nthreads = 40

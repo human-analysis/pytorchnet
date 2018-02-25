@@ -1,3 +1,3 @@
 # __init__.py
 
-from .classification import Classification
+from .classification import *
