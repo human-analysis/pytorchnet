@@ -60,7 +60,7 @@ PyTorchNet loads its parameters at the beginning via a config file and/or the co
 When PyTorchNet is being run, it will automatically load all parameters from [args.txt](https://github.com/human-analysis/pytorchnet/blob/master/args.txt) by default, if it exists. In order to load a custom config file, the following parameter can be used:
 > python main.py --config custom_args.txt
 ### args.txt
-> [Arguments]\
+> [Arguments]
 >  
 > port = 8097\
 > env = main\
@@ -72,7 +72,7 @@ When PyTorchNet is being run, it will automatically load all parameters from [ar
 > dataroot = ./data\
 > dataset_train = CIFAR10\
 > dataset_test = CIFAR10\
-> batch_size = 64\
+> batch_size = 64
 
 
 ## Command line
