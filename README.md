@@ -45,6 +45,8 @@ Before running PyTorchNet, [Visdom](https://github.com/facebookresearch/visdom#u
 PyTorchNet comes with a classification example in which a [ResNet](https://arxiv.org/abs/1512.03385) model is trained for the [CIFAR10](https://www.cs.toronto.edu/~kriz/cifar.html) dataset.
 > python [main.py](https://github.com/human-analysis/pytorchnet/blob/dev/main.py)
 
+![screenshot from 2018-02-24 18-53-13](https://user-images.githubusercontent.com/24301047/36636539-abe73688-1996-11e8-83ea-c43318f24048.png)
+
 ![screenshot from 2018-02-24 18-58-03](https://user-images.githubusercontent.com/24301047/36636483-05f60038-1996-11e8-806e-895638396986.png)
 
 ```{r, engine='bash', sample run}
