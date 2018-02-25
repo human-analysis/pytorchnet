@@ -6,7 +6,7 @@ same_env = Yes
 save_results = No
 
 # dataset options
-dataroot = ../
+dataroot = ./data
 # dataset_options = {"prefetch": "Yes"}
 
 dataset_train = CIFAR10
