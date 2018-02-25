@@ -63,16 +63,26 @@ When PyTorchNet is being run, it will automatically load all parameters from [ar
 > [Arguments]
 >  
 > port = 8097
+>
 > env = main
+>
 > same_env = Yes
+>
 > log_type = traditional
+>
 > save_results = No
+>
 >  
 > \# dataset options
+>
 > dataroot = ./data
+>
 > dataset_train = CIFAR10
+>
 > dataset_test = CIFAR10
+>
 > batch_size = 64
+>
 
 ## Command line
 Parameters can also be set in the command line when invoking [main.py](https://github.com/human-analysis/pytorchnet/blob/master/main.py). These parameters will precede the existing parameters in the configuration file.
