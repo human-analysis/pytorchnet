@@ -1,7 +1,7 @@
 [Arguments]
 
 port = 8097
-env = resnet18_cifar10
+env = main
 same_env = Yes
 save_results = No
 
