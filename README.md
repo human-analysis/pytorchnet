@@ -50,7 +50,3 @@ PyTorchNet comes with a classification example in which a [ResNet](https://arxiv
 ![screenshot from 2018-02-24 18-53-13](https://user-images.githubusercontent.com/24301047/36636539-abe73688-1996-11e8-83ea-c43318f24048.png)
 
 ![screenshot from 2018-02-24 18-58-03](https://user-images.githubusercontent.com/24301047/36636483-05f60038-1996-11e8-806e-895638396986.png)
-
-```{r, engine='bash', sample run}
-python main.py --manual-seed 0 --dataset-train CIFAR10 --dataset-test CIFAR10 --dataroot ../ --nthreads 40 --optim-method Adam --batch-size 64 --learning-rate 3e-4 --beta1 0.9 --beta2 0.999 --nclasses 10 --nchannels 3 --resolution-high 32 --resolution-wide 32 --nepochs 100 --momentum 0.9 --weight-decay 0.0 --port 8097 --net-type resnet18 --nfilters 64 --cuda True --ngpu 1
-```
