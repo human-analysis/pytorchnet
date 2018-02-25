@@ -1,6 +1,5 @@
 # classification.py
 
-import torch
 from torch import nn
 
 __all__ = ['Classification']

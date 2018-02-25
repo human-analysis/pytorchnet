@@ -3,6 +3,8 @@
 from torch.nn.modules import Module
 from torch.autograd.function import InplaceFunction
 
+__all__ = ['CustomDropout']
+
 
 class Dropout(InplaceFunction):
 
@@ -45,9 +47,9 @@ def f_dropout(input, p):
     return Dropout(p)(input)
 
 
-class MyDropout(Module):
+class CustomDropout(Module):
     def __init__(self, p=0.5, inplace=False):
-        super(MyDropout, self).__init__()
+        super(CustomDropout, self).__init__()
         if p < 0 or p > 1:
             raise ValueError("dropout probability has to be between 0 and 1, "
                              "but got {}".format(p))

@@ -25,7 +25,7 @@ def cleanup():
         try:
             os.kill(int(child.pid), signal.SIGKILL)
         except OSError as ex:
-             raise Exception("wasn't able to kill the child process (pid:{}).".format(child.pid))
+            raise Exception("wasn't able to kill the child process (pid:{}).".format(child.pid))
     #     # os.waitpid(child.pid, os.P_ALL)
     print('\x1b[?25h', end='', flush=True)  # show cursor
     sys.exit(0)
@@ -125,15 +125,15 @@ def gaussian(size, center, sigma=1):
     if np.isnan(center[0]) or np.isnan(center[1]):
         return np.zeros(size)
 
-    x,y = np.meshgrid(np.arange(size[0]),np.arange(size[1]))
+    x, y = np.meshgrid(np.arange(size[0]), np.arange(size[1]))
     if center is None:
         x0 = y0 = size // 2
     else:
         x0 = center[0]
         y0 = center[1]
-    den = 2*pow(sigma,2)
-    num = np.power(x-x0,2) + np.power(y-y0,2)
-    return np.exp(-(num / den))/math.sqrt(2*np.pi*sigma*sigma)
+    den = 2 * pow(sigma, 2)
+    num = np.power(x - x0, 2) + np.power(y - y0, 2)
+    return np.exp(-(num / den)) / math.sqrt(2 * np.pi * sigma * sigma)
 
 
 def plotlify(fig, env='main', win='mywin'):

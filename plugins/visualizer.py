@@ -23,8 +23,8 @@ class Visualizer:
             self.values[key]['dtype'] = modules[key]['dtype']
             self.values[key]['vtype'] = modules[key]['vtype']
             self.values[key]['win'] = modules[key]['win'] \
-                                        if 'win' in modules[key].keys() \
-                                        else None
+                if 'win' in modules[key].keys() \
+                else None
             if modules[key]['vtype'] == 'plot':
                 self.values[key]['layout'] = modules[key]['layout'] \
                     if 'layout' in modules[key].keys() \
@@ -42,7 +42,7 @@ class Visualizer:
                     title=key,
                     xaxis=dict(title='Epoch'),
                     yaxis=dict(title=key),
-                    )
+                )
                 fig = dict(data=data, layout=layout)
                 self.values[key]['win'] = self.viz._send(
                     plotlify(fig, env=self.env, win=self.values[key]['win']))

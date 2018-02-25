@@ -10,13 +10,13 @@ import plugins
 class Trainer:
     def __init__(self, args, model, criterion, evaluation):
         self.args = args
-        self.save_results = args.save_results
         self.model = model
         self.criterion = criterion
         self.evaluation = evaluation
+        self.save_results = args.save_results
 
-        self.port = args.port
         self.env = args.env
+        self.port = args.port
         self.dir_save = args.save_dir
         self.log_type = args.log_type
 
@@ -28,32 +28,26 @@ class Trainer:
         self.resolution_wide = args.resolution_wide
 
         self.lr = args.learning_rate
-        self.momentum = args.momentum
-        self.adam_beta1 = args.adam_beta1
-        self.adam_beta2 = args.adam_beta2
-        self.weight_decay = args.weight_decay
         self.optim_method = args.optim_method
+        self.optim_options = args.optim_options
+        self.scheduler_method = args.scheduler_method
+        self.scheduler_options = args.scheduler_options
 
-        if self.optim_method == 'Adam':
-            self.optimizer = optim.Adam(
-                model.parameters(), lr=self.lr, weight_decay=self.weight_decay,
-                betas=(self.adam_beta1, self.adam_beta2),
+        self.optimizer = getattr(optim, self.optim_method)(
+            model.parameters(), lr=self.lr, **self.optim_options)
+        if self.scheduler_method is not None:
+            self.scheduler = getattr(optim.lr_scheduler,
+                                     self.scheduler_method)(
+                self.optimizer, **self.scheduler_options
             )
-        elif self.optim_method == 'RMSprop':
-            self.optimizer = optim.RMSprop(
-                model.parameters(), lr=self.lr, weight_decay=self.weight_decay,
-            )
-        elif self.optim_method == 'SGD':
-            self.optimizer = optim.SGD(
-                model.parameters(), lr=self.lr, weight_decay=self.weight_decay,
-                momentum=self.momentum, nesterov=True
-            )
-        else:
-            raise (Exception("Unknown Optimization Method"))
 
         # for classification
         self.labels = torch.zeros(self.batch_size).long()
-        self.inputs = torch.zeros(self.batch_size, self.resolution_high, self.resolution_wide)
+        self.inputs = torch.zeros(
+            self.batch_size,
+            self.resolution_high,
+            self.resolution_wide
+        )
 
         if args.cuda:
             self.labels = self.labels.cuda()
@@ -63,7 +57,11 @@ class Trainer:
         self.labels = Variable(self.labels)
 
         # logging training
-        self.log_loss = plugins.Logger(args.logs_dir, 'TrainLogger.txt', self.save_results)
+        self.log_loss = plugins.Logger(
+            args.logs_dir,
+            'TrainLogger.txt',
+            self.save_results
+        )
         self.params_loss = ['Loss', 'Accuracy']
         self.log_loss.register(self.params_loss)
 
@@ -78,10 +76,14 @@ class Trainer:
         # visualize training
         self.visualizer = plugins.Visualizer(self.port, self.env, 'Train')
         self.params_visualizer = {
-            'Loss': {'dtype': 'scalar', 'vtype': 'plot', 'win': 'loss', 'layout': {'windows': ['train', 'test'], 'id': 0}},
-            'Accuracy': {'dtype': 'scalar', 'vtype': 'plot', 'win': 'accuracy', 'layout': {'windows': ['train', 'test'], 'id': 0}},
-            'Train_Image': {'dtype': 'image', 'vtype': 'image', 'win': 'train_image'},
-            'Train_Images': {'dtype': 'images', 'vtype': 'images', 'win': 'train_images'},
+            'Loss': {'dtype': 'scalar', 'vtype': 'plot', 'win': 'loss',
+                     'layout': {'windows': ['train', 'test'], 'id': 0}},
+            'Accuracy': {'dtype': 'scalar', 'vtype': 'plot', 'win': 'accuracy',
+                         'layout': {'windows': ['train', 'test'], 'id': 0}},
+            'Train_Image': {'dtype': 'image', 'vtype': 'image',
+                            'win': 'train_image'},
+            'Train_Images': {'dtype': 'images', 'vtype': 'images',
+                             'win': 'train_images'},
         }
         self.visualizer.register(self.params_visualizer)
 
@@ -104,27 +106,12 @@ class Trainer:
         self.evalmodules = []
         self.losses = {}
 
-    def learning_rate(self, epoch):
-        # training schedule
-        return self.lr * (
-            (0.1 ** int(epoch >= 60)) *
-            (0.1 ** int(epoch >= 120)) *
-            (0.1 ** int(epoch >= 160))
-        )
-
-    def get_optimizer(self, epoch, optimizer):
-        lr = self.learning_rate(epoch)
-        for param_group in optimizer.param_groups:
-            param_group['lr'] = lr
-        return optimizer
-
     def model_train(self):
         self.model.train()
 
     def train(self, epoch, dataloader):
         dataloader = dataloader['train']
         self.monitor.reset()
-        self.optimizer = self.get_optimizer(epoch + 1, self.optimizer)
 
         # switch to train mode
         self.model_train()
@@ -153,7 +140,6 @@ class Trainer:
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
-            # self.scheduler.step(loss.data[0])
 
             acc = self.evaluation(outputs, self.labels)
 
@@ -164,7 +150,7 @@ class Trainer:
             if self.log_type == 'traditional':
                 # print batch progress
                 print(self.print_formatter % tuple(
-                    [epoch+1, self.nepochs, i, len(dataloader)] +
+                    [epoch + 1, self.nepochs, i, len(dataloader)] +
                     [self.losses[key] for key in self.params_monitor]))
             elif self.log_type == 'progressbar':
                 # update progress bar
@@ -188,4 +174,11 @@ class Trainer:
         loss['Train_Image'] = inputs[0]
         loss['Train_Images'] = inputs
         self.visualizer.update(loss)
+
+        if self.scheduler_method is not None:
+            if self.scheduler_method == 'ReduceLROnPlateau':
+                self.scheduler.step(loss['Loss'])
+            else:
+                self.scheduler.step()
+
         return self.monitor.getvalues('Loss')

@@ -25,13 +25,14 @@ def parse_args():
         result_path = os.path.join(result_path, now)
 
     # ======================= Data Setings =====================================
+    parser.add_argument('--dataset-root-test', type=str, default=None, help='path of the data')
+    parser.add_argument('--dataset-root-train', type=str, default=None, help='path of the data')
     parser.add_argument('--dataset-test', type=str, default=None, help='name of training dataset')
     parser.add_argument('--dataset-train', type=str, default=None, help='name of training dataset')
     parser.add_argument('--split_test', type=float, default=None, help='test split')
     parser.add_argument('--split_train', type=float, default=None, help='train split')
-    parser.add_argument('--train-dev-percent', type=float, default=None, metavar='', help='percentage of dev in train')
     parser.add_argument('--test-dev-percent', type=float, default=None, metavar='', help='percentage of dev in test')
-    parser.add_argument('--dataroot', type=str, default=None, help='path to the data')
+    parser.add_argument('--train-dev-percent', type=float, default=None, metavar='', help='percentage of dev in train')
     parser.add_argument('--save-dir', type=str, default=os.path.join(result_path, 'Save'), metavar='', help='save the trained models here')
     parser.add_argument('--logs-dir', type=str, default=os.path.join(result_path, 'Logs'), metavar='', help='save the training log files here')
     parser.add_argument('--resume', type=str, default=None, help='full path of models to resume training')
@@ -75,14 +76,11 @@ def parse_args():
     parser.add_argument('--env', type=str, default='', metavar='', help='environment for visualizing training at http://localhost:port')
 
     # ======================= Hyperparameter Setings ===========================
+    parser.add_argument('--learning-rate', type=float, default=None, help='learning rate')
     parser.add_argument('--optim-method', type=str, default=None, help='the optimization routine ')
     parser.add_argument('--optim-options', type=json.loads, default={}, metavar='', help='optimizer-specific parameters, i.e. \'{"lr": 0.001}\'')
-    parser.add_argument('--learning-rate', type=float, default=None, help='learning rate')
-    parser.add_argument('--learning-rate-decay', type=float, default=None, help='learning rate decay')
-    parser.add_argument('--momentum', type=float, default=None, help='momentum')
-    parser.add_argument('--weight-decay', type=float, default=None, help='weight decay')
-    parser.add_argument('--adam-beta1', type=float, default=None, help='Beta 1 parameter for Adam')
-    parser.add_argument('--adam-beta2', type=float, default=None, help='Beta 2 parameter for Adam')
+    parser.add_argument('--scheduler-method', type=str, default=None, help='cosine, step, exponential, plateau')
+    parser.add_argument('--scheduler-options', type=json.loads, default={}, metavar='', help='optimizer-specific parameters')
 
     # ======================== Main Setings ====================================
     parser.add_argument('--log-type', type=str, default='traditional', metavar='', help='allows to select logger type, traditional or progressbar')

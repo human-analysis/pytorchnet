@@ -14,6 +14,9 @@ def weights_init(m):
     elif isinstance(m, nn.BatchNorm2d):
         m.weight.data.fill_(1)
         m.bias.data.zero_()
+    elif isinstance(m, nn.Linear):
+        m.weight.data.normal_(0, 1)
+        m.bias.data.zero_()
 
 
 class Model:
@@ -30,7 +33,8 @@ class Model:
     def setup(self, checkpoints):
         model = getattr(models, self.model_type)(**self.model_options)
         criterion = getattr(losses, self.loss_type)(**self.loss_options)
-        evaluation = getattr(evaluate, self.evaluation_type)(**self.evaluation_options)
+        evaluation = getattr(evaluate, self.evaluation_type)(
+            **self.evaluation_options)
 
         if self.cuda:
             model = nn.DataParallel(model, device_ids=list(range(self.ngpu)))
@@ -41,6 +45,6 @@ class Model:
             pass
             # model.apply(weights_init)
         else:
-            model.load_state_dict(checkpoints.load(checkpoints.latest('resume')))
+            model = checkpoints.load(model, checkpoints.latest('resume'))
 
         return model, criterion, evaluation

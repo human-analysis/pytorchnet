@@ -14,7 +14,7 @@ PyTorchNet consists of the following packages:
 ## Datasets
 This is for loading and transforming datasets.
 ## Models
-Network models are kept in this package. It already includes [ResNet](https://arxiv.org/abs/1512.03385) and [Stacked Hourglass](https://arxiv.org/abs/1603.06937).
+Network models are kept in this package. It already includes [ResNet](https://arxiv.org/abs/1512.03385), [PreActResNet](https://arxiv.org/abs/1603.05027), [Stacked Hourglass](https://arxiv.org/abs/1603.06937) and [SphereFace](https://arxiv.org/abs/1704.08063).
 ## Losses
 There are number of different choices available for Classification or Regression. New loss methods can be put here.
 ## Evaluates

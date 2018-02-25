@@ -275,7 +275,6 @@ class Dataloader:
         else:
             raise(Exception("Unknown Dataset"))
 
-
     def create(self, flag=None):
         dataloader = {}
         if flag == "Train":
@@ -324,14 +323,16 @@ class Dataloader:
             train_dev_sampler = SubsetRandomSampler(train_dev_indices)
 
             dataloader['train'] = torch.utils.data.DataLoader(
-                    self.dataset_train, batch_size=self.args.batch_size,
-                    sampler=train_sampler, num_workers=self.args.nthreads,
-                    pin_memory=True)
+                self.dataset_train, batch_size=self.args.batch_size,
+                sampler=train_sampler, num_workers=self.args.nthreads,
+                pin_memory=True
+            )
 
             dataloader['train_dev'] = torch.utils.data.DataLoader(
-                    self.dataset_train, batch_size=self.args.batch_size,
-                    sampler=train_dev_sampler, num_workers=self.args.nthreads,
-                    pin_memory=True)
+                self.dataset_train, batch_size=self.args.batch_size,
+                sampler=train_dev_sampler, num_workers=self.args.nthreads,
+                pin_memory=True
+            )
 
         if flag is None or flag == "test":
             test_len = len(self.dataset_test)
@@ -344,13 +345,15 @@ class Dataloader:
             test_dev_sampler = SubsetRandomSampler(test_dev_indices)
 
             dataloader['test_dev'] = torch.utils.data.DataLoader(
-                    self.dataset_test, batch_size=self.args.batch_size,
-                    sampler=test_dev_sampler, num_workers=self.args.nthreads,
-                    pin_memory=True)
+                self.dataset_test, batch_size=self.args.batch_size,
+                sampler=test_dev_sampler, num_workers=self.args.nthreads,
+                pin_memory=True
+            )
 
             dataloader['test'] = torch.utils.data.DataLoader(
-                    self.dataset_test, batch_size=self.args.batch_size,
-                    sampler=test_sampler, num_workers=self.args.nthreads,
-                    pin_memory=True)
+                self.dataset_test, batch_size=self.args.batch_size,
+                sampler=test_sampler, num_workers=self.args.nthreads,
+                pin_memory=True
+            )
 
         return dataloader

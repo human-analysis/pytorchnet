@@ -18,7 +18,7 @@ class Checkpoints:
             return self.model_filename
 
     def save(self, epoch, model, best):
-        if best:
+        if best is True:
             torch.save(model.state_dict(),
                        '%s/model_epoch_%d.pth' % (self.dir_save, epoch))
 

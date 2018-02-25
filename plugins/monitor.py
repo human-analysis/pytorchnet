@@ -34,14 +34,13 @@ class Monitor:
             if self.values[key]['dtype'] == 'running_mean':
                 if not self.smoothing:
                     self.values[key]['value'] = (self.values[key][
-                                                     'value'] * self.num +
+                                                 'value'] * self.num +
                                                  modules[key] * batch_size
                                                  ) / (self.num + batch_size)
                 else:
                     self.values[key]['value'] = self.values[key][
-                                                    'value'] * self.smoothness + \
-                                                modules[key] * (
-                                                1 - self.smoothness)
+                        'value'] * self.smoothness + \
+                        modules[key] * (1 - self.smoothness)
             else:
                 raise Exception('Data type not supported, please update the '
                                 'monitor plugin and rerun !!')

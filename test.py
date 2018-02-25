@@ -9,13 +9,13 @@ import plugins
 class Tester:
     def __init__(self, args, model, criterion, evaluation):
         self.args = args
-        self.save_results = args.save_results
         self.model = model
         self.criterion = criterion
         self.evaluation = evaluation
+        self.save_results = args.save_results
 
-        self.port = args.port
         self.env = args.env
+        self.port = args.port
         self.dir_save = args.save_dir
         self.log_type = args.log_type
 
@@ -28,7 +28,11 @@ class Tester:
 
         # for classification
         self.labels = torch.zeros(self.batch_size).long()
-        self.inputs = torch.zeros(self.batch_size, self.resolution_high, self.resolution_wide)
+        self.inputs = torch.zeros(
+            self.batch_size,
+            self.resolution_high,
+            self.resolution_wide
+        )
 
         if args.cuda:
             self.labels = self.labels.cuda()
@@ -38,7 +42,11 @@ class Tester:
         self.labels = Variable(self.labels, volatile=True)
 
         # logging testing
-        self.log_loss = plugins.Logger(args.logs_dir, 'TestLogger.txt', self.save_results)
+        self.log_loss = plugins.Logger(
+            args.logs_dir,
+            'TestLogger.txt',
+            self.save_results
+        )
         self.params_loss = ['Loss', 'Accuracy']
         self.log_loss.register(self.params_loss)
 
@@ -53,10 +61,14 @@ class Tester:
         # visualize testing
         self.visualizer = plugins.Visualizer(self.port, self.env, 'Test')
         self.params_visualizer = {
-            'Loss': {'dtype': 'scalar', 'vtype': 'plot', 'win': 'loss', 'layout': {'windows':['train', 'test'], 'id':1}},
-            'Accuracy': {'dtype': 'scalar', 'vtype': 'plot', 'win': 'accuracy', 'layout': {'windows':['train', 'test'], 'id':1}},
-            'Test_Image': {'dtype': 'image', 'vtype': 'image', 'win': 'test_image'},
-            'Test_Images': {'dtype': 'images', 'vtype': 'images', 'win': 'test_images'},
+            'Loss': {'dtype': 'scalar', 'vtype': 'plot', 'win': 'loss',
+                     'layout': {'windows': ['train', 'test'], 'id': 1}},
+            'Accuracy': {'dtype': 'scalar', 'vtype': 'plot', 'win': 'accuracy',
+                         'layout': {'windows': ['train', 'test'], 'id': 1}},
+            'Test_Image': {'dtype': 'image', 'vtype': 'image',
+                           'win': 'test_image'},
+            'Test_Images': {'dtype': 'images', 'vtype': 'images',
+                            'win': 'test_images'},
         }
         self.visualizer.register(self.params_visualizer)
 
@@ -80,10 +92,6 @@ class Tester:
 
     def model_eval(self):
         self.model.eval()
-        # for m in self.model.modules():
-        #     for i in range(len(self.evalmodules)):
-        #         if isinstance(m, self.evalmodules[i]):
-        #             m.train()
 
     def test(self, epoch, dataloader):
         dataloader = dataloader['test']
@@ -124,7 +132,7 @@ class Tester:
             if self.log_type == 'traditional':
                 # print batch progress
                 print(self.print_formatter % tuple(
-                    [epoch+1, self.nepochs, i, len(dataloader)] +
+                    [epoch + 1, self.nepochs, i, len(dataloader)] +
                     [self.losses[key] for key in self.params_monitor]))
             elif self.log_type == 'progressbar':
                 # update progress bar
