@@ -17,6 +17,7 @@ class Tester:
         self.port = args.port
         self.env = args.env
         self.dir_save = args.save_dir
+        self.log_type = args.log_type
 
         self.cuda = args.cuda
         self.nepochs = args.nepochs
@@ -59,14 +60,20 @@ class Tester:
         }
         self.visualizer.register(self.params_visualizer)
 
-        # progress bar message formatter
-        self.print_formatter = '({}/{})' \
-                               ' Load: {:.6f}s' \
-                               ' | Process: {:.3f}s' \
-                               ' | Total: {:}' \
-                               ' | ETA: {:}'
-        for item in self.params_loss:
-            self.print_formatter += ' | ' + item + ' {:.4f}'
+        if self.log_type == 'traditional':
+            # display training progress
+            self.print_formatter = 'Test [%d/%d][%d/%d] '
+            for item in self.params_loss:
+                self.print_formatter += item + " %.4f "
+        elif self.log_type == 'progressbar':
+            # progress bar message formatter
+            self.print_formatter = '({}/{})' \
+                                   ' Load: {:.6f}s' \
+                                   ' | Process: {:.3f}s' \
+                                   ' | Total: {:}' \
+                                   ' | ETA: {:}'
+            for item in self.params_loss:
+                self.print_formatter += ' | ' + item + ' {:.4f}'
 
         self.evalmodules = []
         self.losses = {}
@@ -86,16 +93,15 @@ class Tester:
         # switch to eval mode
         self.model_eval()
 
-        # progress bar
-        data_time = 0
-        batch_time = 0
-        processed_data_len = 0
-        bar = plugins.Bar('{:<10}'.format('Test'), max=len(dataloader))
+        if self.log_type == 'progressbar':
+            # progress bar
+            processed_data_len = 0
+            bar = plugins.Bar('{:<10}'.format('Test'), max=len(dataloader))
         end = time.time()
 
         for i, (inputs, labels) in enumerate(dataloader):
             # keeps track of data loading time
-            data_time += time.time() - end
+            data_time = time.time() - end
 
             ############################
             # Evaluate Network
@@ -115,19 +121,25 @@ class Tester:
             self.losses['Loss'] = loss.data[0]
             self.monitor.update(self.losses, batch_size)
 
-            # update progress bar
-            batch_time += time.time() - end
-            processed_data_len += len(inputs)
-            bar.suffix = self.print_formatter.format(
-                *[processed_data_len, len(dataloader.sampler), data_time,
-                  batch_time, bar.elapsed_td, bar.eta_td] +
-                 [self.losses[key] for key in self.params_monitor]
-            )
-            bar.next()
+            if self.log_type == 'traditional':
+                # print batch progress
+                print(self.print_formatter % tuple(
+                    [epoch, self.nepochs, i, len(dataloader)] +
+                    [self.losses[key] for key in self.params_monitor]))
+            elif self.log_type == 'progressbar':
+                # update progress bar
+                batch_time = time.time() - end
+                processed_data_len += len(inputs)
+                bar.suffix = self.print_formatter.format(
+                    *[processed_data_len, len(dataloader.sampler), data_time,
+                      batch_time, bar.elapsed_td, bar.eta_td] +
+                     [self.losses[key] for key in self.params_monitor]
+                )
+                bar.next()
+                end = time.time()
 
-            end = time.time()
-
-        bar.finish()
+        if self.log_type == 'progressbar':
+            bar.finish()
 
         loss = self.monitor.getvalues()
         self.log_loss.update(loss)

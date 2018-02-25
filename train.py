@@ -18,6 +18,7 @@ class Trainer:
         self.port = args.port
         self.env = args.env
         self.dir_save = args.save_dir
+        self.log_type = args.log_type
 
         self.cuda = args.cuda
         self.nepochs = args.nepochs
@@ -84,15 +85,21 @@ class Trainer:
         }
         self.visualizer.register(self.params_visualizer)
 
-        # progress bar message formatter
-        self.print_formatter = '({}/{})' \
-                               ' Load: {:.6f}s' \
-                               ' | Process: {:.3f}s' \
-                               ' | Total: {:}' \
-                               ' | ETA: {:}'
-        for item in self.params_loss:
-            self.print_formatter += ' | ' + item + ' {:.4f}'
-        self.print_formatter += ' | lr: {:.2e}'
+        if self.log_type == 'traditional':
+            # display training progress
+            self.print_formatter = 'Train [%d/%d][%d/%d] '
+            for item in self.params_loss:
+                self.print_formatter += item + " %.4f "
+        elif self.log_type == 'progressbar':
+            # progress bar message formatter
+            self.print_formatter = '({}/{})' \
+                                   ' Load: {:.6f}s' \
+                                   ' | Process: {:.3f}s' \
+                                   ' | Total: {:}' \
+                                   ' | ETA: {:}'
+            for item in self.params_loss:
+                self.print_formatter += ' | ' + item + ' {:.4f}'
+            self.print_formatter += ' | lr: {:.2e}'
 
         self.evalmodules = []
         self.losses = {}
@@ -122,9 +129,10 @@ class Trainer:
         # switch to train mode
         self.model_train()
 
-        # Progress bar
-        processed_data_len = 0
-        bar = plugins.Bar('{:<10}'.format('Train'), max=len(dataloader))
+        if self.log_type == 'progressbar':
+            # Progress bar
+            processed_data_len = 0
+            bar = plugins.Bar('{:<10}'.format('Train'), max=len(dataloader))
         end = time.time()
 
         for i, (inputs, labels) in enumerate(dataloader):
@@ -153,20 +161,27 @@ class Trainer:
             self.losses['Loss'] = loss.data[0]
             self.monitor.update(self.losses, batch_size)
 
-            # update progress bar
-            batch_time = time.time() - end
-            processed_data_len += len(inputs)
+            if self.log_type == 'traditional':
+                # print batch progress
+                print(self.print_formatter % tuple(
+                    [epoch, self.nepochs, i, len(dataloader)] +
+                    [self.losses[key] for key in self.params_monitor]))
+            elif self.log_type == 'progressbar':
+                # update progress bar
+                batch_time = time.time() - end
+                processed_data_len += len(inputs)
 
-            bar.suffix = self.print_formatter.format(
-                *[processed_data_len, len(dataloader.sampler), data_time,
-                  batch_time, bar.elapsed_td, bar.eta_td] +
-                 [self.losses[key] for key in self.params_monitor] +
-                 [self.optimizer.param_groups[-1]['lr']]
-            )
-            bar.next()
-            end = time.time()
+                bar.suffix = self.print_formatter.format(
+                    *[processed_data_len, len(dataloader.sampler), data_time,
+                      batch_time, bar.elapsed_td, bar.eta_td] +
+                     [self.losses[key] for key in self.params_monitor] +
+                     [self.optimizer.param_groups[-1]['lr']]
+                )
+                bar.next()
+                end = time.time()
 
-        bar.finish()
+        if self.log_type == 'progressbar':
+            bar.finish()
 
         loss = self.monitor.getvalues()
         self.log_loss.update(loss)

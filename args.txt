@@ -3,6 +3,7 @@
 port = 8097
 env = main
 same_env = Yes
+log_type = traditional
 save_results = No
 
 # dataset options

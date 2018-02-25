@@ -85,6 +85,7 @@ def parse_args():
     parser.add_argument('--adam-beta2', type=float, default=None, help='Beta 2 parameter for Adam')
 
     # ======================== Main Setings ====================================
+    parser.add_argument('--log-type', type=str, default='traditional', metavar='', help='allows to select logger type, traditional or progressbar')
     parser.add_argument('--same-env', type=utils.str2bool, default='No', metavar='', help='does not add date and time to the visdom environment name')
     parser.add_argument('-s', '--save', '--save-results', type=utils.str2bool, dest="save_results", default='No', metavar='', help='save the arguments and the results')
 
