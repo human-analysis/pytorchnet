@@ -33,7 +33,7 @@ There are already three different plugins available:
 First, you need to download PyTorchNet by calling the following command:
 > git clone --recursive https://github.com/human-analysis/pytorchnet.git
 
-Since PyTorchNet relies on several Python packages, you need to install the requirements by executing the following command in the root directory of PyTorchNet:
+Since PyTorchNet relies on several Python packages, you need to install the requirements by executing the following command in the *pytorchnet* directory:
 > pip install -r requirements.txt
 
 Congratulations!!! You are now ready to use PyTorchNet!
