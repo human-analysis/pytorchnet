@@ -37,7 +37,9 @@ Since PyTorchNet relies on several Python packages, you need to make sure that t
 > pip install -r requirements.txt
 
 ## Pytorch
-If you do not have Pytorch or it does not meet the requirements, please follow the instruction on [the Pytorch website](http://pytorch.org/#pip-install-pytorch). 
+If you do not have Pytorch or it does not meet the requirements, please follow the instruction on [the Pytorch website](http://pytorch.org/#pip-install-pytorch).
+
+
 Congratulations!!! You are now ready to use PyTorchNet!
 
 # Usage
