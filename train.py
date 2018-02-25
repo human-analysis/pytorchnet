@@ -164,7 +164,7 @@ class Trainer:
             if self.log_type == 'traditional':
                 # print batch progress
                 print(self.print_formatter % tuple(
-                    [epoch, self.nepochs, i, len(dataloader)] +
+                    [epoch+1, self.nepochs, i, len(dataloader)] +
                     [self.losses[key] for key in self.params_monitor]))
             elif self.log_type == 'progressbar':
                 # update progress bar
