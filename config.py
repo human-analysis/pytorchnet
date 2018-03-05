@@ -5,6 +5,8 @@ import argparse
 import json
 import configparser
 import utils
+import re
+from ast import literal_eval as make_tuple
 
 
 def parse_args():
@@ -101,5 +103,23 @@ def parse_args():
     if not args.same_env:
         args.env += '_' + now
     args.result_path = result_path
+
+    # refine json arguments
+    pattern = re.compile('^\(.+\)')
+
+    for arg_name in vars(args):
+        # print(arg, getattr(args, arg))
+        arg_value = getattr(args, arg_name)
+        if isinstance(arg_value, str) and pattern.match(arg_value):
+            setattr(args, arg_name, make_tuple(arg_value))
+            print(arg_name, arg_value)
+        elif isinstance(arg_value, dict):
+            dict_changed = False
+            for key, value in arg_value.items():
+                if isinstance(value, str) and pattern.match(value):
+                    dict_changed = True
+                    arg_value[key] = make_tuple(value)
+            if dict_changed:
+                setattr(args, arg_name, arg_value)
 
     return args
