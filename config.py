@@ -104,7 +104,8 @@ def parse_args():
         args.env += '_' + now
     args.result_path = result_path
 
-    # refine json arguments
+    # refine tuple arguments: this section converts tuples that are
+    #                         passed as string back to actual tuples.
     pattern = re.compile('^\(.+\)')
 
     for arg_name in vars(args):
