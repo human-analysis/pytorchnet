@@ -5,12 +5,12 @@ from torch import nn
 __all__ = ['Classification']
 
 
+# REVIEW: does this have to inherit nn.Module?
 class Classification(nn.Module):
-
     def __init__(self):
         super(Classification, self).__init__()
         self.loss = nn.CrossEntropyLoss()
 
-    def __call__(self, input, target):
-        loss = self.loss(input, target)
+    def __call__(self, inputs, targets):
+        loss = self.loss(inputs, targets)
         return loss

@@ -36,8 +36,7 @@ class Trainer:
         self.optimizer = getattr(optim, self.optim_method)(
             model.parameters(), lr=self.lr, **self.optim_options)
         if self.scheduler_method is not None:
-            self.scheduler = getattr(optim.lr_scheduler,
-                                     self.scheduler_method)(
+            self.scheduler = getattr(optim.lr_scheduler, self.scheduler_method)(
                 self.optimizer, **self.scheduler_options
             )
 
