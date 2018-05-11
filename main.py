@@ -67,4 +67,5 @@ if __name__ == "__main__":
     except Exception:
         traceback.print_exc(file=sys.stdout)
     finally:
+        traceback.print_exc(file=sys.stdout)
         utils.cleanup()
