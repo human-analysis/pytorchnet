@@ -24,7 +24,7 @@ label_filename_test = ./test_label
 batch_size = 64
 
 # model options
-model_type = resnet18
+model_type = preactresnet18
 model_options = {"nchannels": 3, "nfilters": 64, "nclasses": 10}
 loss_type = Classification
 loss_options = {}
@@ -35,14 +35,14 @@ resolution_high = 32
 resolution_wide = 32
 
 manual_seed = 0
-nepochs = 200
+nepochs = 350
 
 optim_method = SGD
 learning_rate = 1e-1
-optim_options = {"momentum": 0.9, "weight_decay": 0.0}
+optim_options = {"momentum": 0.9, "weight_decay": 5e-4}
 
-scheduler_method = CosineAnnealingLR
-scheduler_options = {"T_max": 25, "eta_min": 1e-6}
+scheduler_method = MultiStepLR
+scheduler_options = {"milestones": [150, 250]}
 
 # cpu/gpu settings
 cuda = True

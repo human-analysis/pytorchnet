@@ -81,9 +81,8 @@ class PreActBottleneck(nn.Module):
 class PreActResNet(nn.Module):
 
     def __init__(self, block, layers, nchannels=3, nfilters=64,
-                 ndim=512, nclasses=1000):
+                 nclasses=1000):
         super(PreActResNet, self).__init__()
-        self.ndim = ndim
         self.nclasses = nclasses
         self.nchannels = nchannels
         self.nfilters = nfilters
@@ -105,9 +104,6 @@ class PreActResNet(nn.Module):
                                        stride=2)
         self.fc = nn.Linear(8 * self.nfilters * block.expansion, self.nclasses)
 
-        if self.nclasses > 0:
-            self.fc2 = nn.Linear(self. ndim, self.nclasses)
-
     def _make_layer(self, block, planes, num_blocks, stride):
         strides = [stride] + [1] * (num_blocks - 1)
         layers = []
@@ -116,7 +112,7 @@ class PreActResNet(nn.Module):
             self.inplanes = planes * block.expansion
         return nn.Sequential(*layers)
 
-    def forward(self, x, features=False):
+    def forward(self, x):
         x = self.conv1(x)
         x = self.maxpool(self.relu1(self.bn1(x)))
 
@@ -129,14 +125,7 @@ class PreActResNet(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.fc(x)
 
-        if self.nclasses > 0:
-            if features is True:
-                return [x]
-            else:
-                y = self.fc2(x)
-                return [x, y]
-        else:
-            return [x]
+        return x
 
 
 def preactresnet18(**kwargs):

@@ -49,10 +49,10 @@ def _debuginfo(self, *message):
           '\033[95m', self.__class__.__name__, '\033[94m', message, '\033[0m')
 
 
-def readcsvfile(filename):
+def readcsvfile(filename, delimiter=','):
     with open(filename, 'r') as f:
         content = []
-        reader = csv.reader(f, delimiter=" ")
+        reader = csv.reader(f, delimiter=delimiter)
         for row in reader:
             content.append(row)
     f.close()
