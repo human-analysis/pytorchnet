@@ -22,9 +22,10 @@ class Checkpoints:
             torch.save(model.state_dict(),
                        '%s/model_epoch_%d.pth' % (self.dir_save, epoch))
 
-    def load(self, filename):
+    def load(self, model, filename):
         if os.path.isfile(filename):
             print("=> loading checkpoint '{}'".format(filename))
             state_dict = torch.load(filename)
-            return state_dict
+            model.load_state_dict(state_dict)
+            return model
         raise (Exception("=> no checkpoint found at '{}'".format(filename)))

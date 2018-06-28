@@ -37,9 +37,9 @@ resolution_wide = 32
 manual_seed = 0
 nepochs = 350
 
-optim_method = SGD
 learning_rate = 1e-1
-optim_options = {"momentum": 0.9, "weight_decay": 5e-4}
+optim_method = Adam
+optim_options = {"betas": "(0.9, 0.999)"}
 
 scheduler_method = MultiStepLR
 scheduler_options = {"milestones": [150, 250]}
