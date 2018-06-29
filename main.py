@@ -16,6 +16,7 @@ from checkpoints import Checkpoints
 def main():
     # parse the arguments
     args = config.parse_args()
+    args.device = torch.device("cuda:0" if (args.ngpu > 0 and torch.cuda.is_available()) else "cpu")
     random.seed(args.manual_seed)
     torch.manual_seed(args.manual_seed)
     if args.save_results:

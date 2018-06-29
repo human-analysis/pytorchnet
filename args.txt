@@ -7,7 +7,7 @@ log_type = traditional
 save_results = No
 
 # dataset options
-dataroot = ./data
+dataroot = ../../../data
 # dataset_options = {"prefetch": "Yes"}
 
 dataset_train = CIFAR10
@@ -21,7 +21,7 @@ label_filename_test = ./test_label
 # train_dev_percent = 0.10
 # test_dev_percent = 0.10
 
-batch_size = 64
+batch_size = 128
 
 # model options
 model_type = preactresnet18
@@ -37,14 +37,14 @@ resolution_wide = 32
 manual_seed = 0
 nepochs = 350
 
+optim_method = SGD
 learning_rate = 1e-1
-optim_method = Adam
-optim_options = {"betas": "(0.9, 0.999)"}
+optim_options = {"momentum": 0.9, "weight_decay": 5e-4}
 
 scheduler_method = MultiStepLR
 scheduler_options = {"milestones": [150, 250]}
 
 # cpu/gpu settings
-cuda = True
+# ngpu=0 uses cpu by default
 ngpu = 1
 nthreads = 20

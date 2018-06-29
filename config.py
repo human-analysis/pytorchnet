@@ -64,7 +64,6 @@ def parse_args():
     parser.add_argument('--tau', type=float, default=None, help='Tau')
 
     # ======================= Training Settings ================================
-    parser.add_argument('--cuda', type=utils.str2bool, default=None, help='run on gpu')
     parser.add_argument('--ngpu', type=int, default=None, help='number of gpus to use')
     parser.add_argument('--batch-size', type=int, default=None, help='batch size for training')
     parser.add_argument('--nepochs', type=int, default=None, help='number of epochs to train')

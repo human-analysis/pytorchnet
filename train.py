@@ -3,7 +3,6 @@
 import time
 import torch
 import torch.optim as optim
-from torch.autograd import Variable
 import plugins
 
 
@@ -20,7 +19,7 @@ class Trainer:
         self.dir_save = args.save_dir
         self.log_type = args.log_type
 
-        self.cuda = args.cuda
+        self.device = args.device
         self.nepochs = args.nepochs
         self.batch_size = args.batch_size
 
@@ -41,19 +40,17 @@ class Trainer:
             )
 
         # for classification
-        self.labels = torch.zeros(self.batch_size).long()
+        self.labels = torch.zeros(
+            self.batch_size,
+            dtype=torch.long,
+            device=self.device
+        )
         self.inputs = torch.zeros(
             self.batch_size,
             self.resolution_high,
-            self.resolution_wide
+            self.resolution_wide,
+            device=self.device
         )
-
-        if args.cuda:
-            self.labels = self.labels.cuda()
-            self.inputs = self.inputs.cuda()
-
-        self.inputs = Variable(self.inputs)
-        self.labels = Variable(self.labels)
 
         # logging training
         self.log_loss = plugins.Logger(
@@ -130,8 +127,8 @@ class Trainer:
             ############################
 
             batch_size = inputs.size(0)
-            self.inputs.data.resize_(inputs.size()).copy_(inputs)
-            self.labels.data.resize_(labels.size()).copy_(labels)
+            self.inputs.resize_(inputs.size()).copy_(inputs)
+            self.labels.resize_(labels.size()).copy_(labels)
 
             outputs = self.model(self.inputs)
             loss = self.criterion(outputs, self.labels)
@@ -142,8 +139,11 @@ class Trainer:
 
             acc = self.evaluation(outputs, self.labels)
 
+            acc = acc.item()
+            loss = loss.item()
+
             self.losses['Accuracy'] = acc
-            self.losses['Loss'] = loss.data[0]
+            self.losses['Loss'] = loss
             self.monitor.update(self.losses, batch_size)
 
             if self.log_type == 'traditional':
