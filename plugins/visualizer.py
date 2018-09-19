@@ -43,7 +43,8 @@ class Visualizer:
                     xaxis=dict(title='Epoch'),
                     yaxis=dict(title=key),
                 )
-                fig = dict(data=data, layout=layout)
+                fig = go.Figure(data=data, layout=layout)
+                fig = fig.to_dict()
                 self.values[key]['win'] = self.viz._send(
                     plotlify(fig, env=self.env, win=self.values[key]['win']))
             elif modules[key]['vtype'] == 'image':
@@ -77,7 +78,9 @@ class Visualizer:
                     x=np.array([self.iteration]).tolist(),
                     y=np.array([self.values[key]['value'][-1]]).tolist(),
                 )
-                fig = dict(data=data, append=True)
+                data = go.Figure(data=data)
+                fig = data.to_dict()
+                fig['append'] = True
                 self.viz._send(
                     plotlify(fig, env=self.env,
                              win=self.values[key]['win']), endpoint='update')

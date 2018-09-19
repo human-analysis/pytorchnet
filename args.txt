@@ -24,8 +24,9 @@ label_filename_test = ./test_label
 batch_size = 128
 
 # model options
-model_type = preactresnet18
-model_options = {"nchannels": 3, "nfilters": 64, "nclasses": 10}
+# model_type = preactresnet18
+model_type = lbcresnet18
+model_options = {"nchannels": 3, "nfilters": 64, "nclasses": 10, "sparsity": 0.2}
 loss_type = Classification
 loss_options = {}
 evaluation_type = Top1Classification

@@ -33,7 +33,8 @@ class Trainer:
         self.scheduler_options = args.scheduler_options
 
         self.optimizer = getattr(optim, self.optim_method)(
-            model.parameters(), lr=self.lr, **self.optim_options)
+            filter(lambda p: p.requires_grad, model.parameters()),
+            lr=self.lr, **self.optim_options)
         if self.scheduler_method is not None:
             self.scheduler = getattr(optim.lr_scheduler, self.scheduler_method)(
                 self.optimizer, **self.scheduler_options
