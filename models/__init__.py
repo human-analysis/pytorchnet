@@ -9,3 +9,4 @@ from .preactresnet import *
 from .sphereface import *
 from .pnnresnet import *
 from .lbcresnet import *
+from .invnet import *

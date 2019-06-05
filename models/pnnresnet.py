@@ -12,10 +12,10 @@ def conv3x3(in_planes, out_planes, stride=1):
 
 
 class PerturbationLayer(nn.Module):
-    def __init__(self, in_planes, out_planes, level, device):
+    def __init__(self, in_planes, out_planes, level):
         super(PerturbationLayer, self).__init__()
         self.noise = nn.Parameter(
-            torch.Tensor(0), requires_grad=False).to(device)
+            torch.Tensor(0), requires_grad=False)
 
         self.level = level
         self.layers = nn.Sequential(
@@ -27,7 +27,7 @@ class PerturbationLayer(nn.Module):
     def forward(self, x):
         if self.noise.numel() == 0:
             self.noise.resize_(x.data[0].shape).uniform_()
-            self.noise = (2 * self.noise - 1) * self.level
+            self.noise.mul_(2).add_(-1).mul_(self.level)
 
         y = torch.add(x, self.noise)
         z = self.layers(y)
@@ -132,31 +132,31 @@ class PerturbationResNet(nn.Module):
         return x8
 
 
-def perturbationresnet18(**kwargs):
+def pnnresnet18(**kwargs):
     """Constructs a PreActResNet-18 model.
     """
     return PerturbationResNet(PerturbationBasicBlock, [2, 2, 2, 2], **kwargs)
 
 
-def perturbationresnet34(**kwargs):
+def pnnresnet34(**kwargs):
     """Constructs a PreActResNet-34 model.
     """
     return PerturbationResNet(PerturbationBasicBlock, [3, 4, 6, 3], **kwargs)
 
 
-def perturbationresnet50(**kwargs):
+def pnnresnet50(**kwargs):
     """Constructs a PreActResNet-50 model.
     """
     return PerturbationResNet(PerturbationBottleneck, [3, 4, 6, 3], **kwargs)
 
 
-def perturbationresnet101(**kwargs):
+def pnnresnet101(**kwargs):
     """Constructs a PreActResNet-101 model.
     """
     return PerturbationResNet(PerturbationBottleneck, [3, 4, 23, 3], **kwargs)
 
 
-def perturbationresnet152(**kwargs):
+def pnnresnet152(**kwargs):
     """Constructs a PreActResNet-152 model.
     """
     return PerturbationResNet(PerturbationBottleneck, [3, 8, 36, 3], **kwargs)

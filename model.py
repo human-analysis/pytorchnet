@@ -36,7 +36,7 @@ class Model:
         evaluation = getattr(evaluate, self.evaluation_type)(
             **self.evaluation_options)
 
-        if self.ngpu > 0:
+        if self.ngpu > 1:
             model = nn.DataParallel(model, device_ids=list(range(self.ngpu)))
         model = model.to(self.device)
         criterion = criterion.to(self.device)

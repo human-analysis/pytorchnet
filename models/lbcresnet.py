@@ -5,6 +5,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+__all__ = ['LBCResNet', 'lbcresnet18', 'lbcresnet34',
+           'lbcresnet50', 'lbcresnet101', 'lbcresnet152']
+
 
 def conv3x3(in_planes, out_planes, stride=1):
     conv2d = nn.Conv2d(in_planes, out_planes, kernel_size=3,

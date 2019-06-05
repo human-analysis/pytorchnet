@@ -3,8 +3,8 @@
 port = 8097
 env = main
 same_env = Yes
-log_type = traditional
-save_results = No
+log_type = progressbar
+save_results = Yes
 
 # dataset options
 dataroot = ../../../data
@@ -21,12 +21,11 @@ label_filename_test = ./test_label
 # train_dev_percent = 0.10
 # test_dev_percent = 0.10
 
-batch_size = 128
+batch_size = 512
 
 # model options
-# model_type = preactresnet18
-model_type = lbcresnet18
-model_options = {"nchannels": 3, "nfilters": 64, "nclasses": 10, "sparsity": 0.2}
+model_type = preactresnet18
+model_options = {"nfilters": 64, "nclasses": 10}
 loss_type = Classification
 loss_options = {}
 evaluation_type = Top1Classification
@@ -38,9 +37,9 @@ resolution_wide = 32
 manual_seed = 0
 nepochs = 350
 
-optim_method = SGD
-learning_rate = 1e-1
-optim_options = {"momentum": 0.9, "weight_decay": 5e-4}
+optim_method = Adam
+learning_rate = 3e-4
+optim_options = {"weight_decay": 5e-4}
 
 scheduler_method = MultiStepLR
 scheduler_options = {"milestones": [150, 250]}

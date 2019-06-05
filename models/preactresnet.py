@@ -54,8 +54,7 @@ class PreActBottleneck(nn.Module):
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
         self.bn2 = nn.BatchNorm2d(planes)
         self.relu2 = nn.PReLU(planes)
-        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
-                               padding=1, bias=False)
+        self.conv2 = conv3x3(planes, planes, stride=stride)
         self.bn3 = nn.BatchNorm2d(planes)
         self.relu3 = nn.PReLU(planes)
         self.conv3 = nn.Conv2d(planes, planes * self.expansion,

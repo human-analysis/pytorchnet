@@ -137,6 +137,7 @@ class Trainer:
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
+            # self.model.free()
 
             acc = self.evaluation(outputs, self.labels)
 

@@ -53,7 +53,8 @@ def main():
 
         # train for a single epoch
         loss_train = trainer.train(epoch, loaders)
-        loss_test = tester.test(epoch, loaders)
+        with torch.no_grad():  # operations inside don't track history
+            loss_test = tester.test(epoch, loaders)
 
         if loss_best > loss_test:
             model_best = True
