@@ -122,6 +122,7 @@ class Trainer:
         for i, (inputs, labels) in enumerate(dataloader):
             # keeps track of data loading time
             data_time = time.time() - end
+            end = time.time()
 
             ############################
             # Update network

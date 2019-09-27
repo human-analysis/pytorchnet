@@ -102,3 +102,5 @@ results/
 # data folder
 data/
 
+# OS Files
+.DS_Store
