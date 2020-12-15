@@ -4,13 +4,13 @@ port = 8097
 env = main
 same_env = Yes
 log_type = progressbar
-save_results = Yes
+save_results = No
 
 # dataset options
 dataroot = ../../../data
 # dataset_options = {"prefetch": "Yes"}
 
-dataset_train = CIFAR10
+dataset_train =
 input_filename_train = ./train_input
 label_filename_train = ./train_label
 
@@ -21,18 +21,18 @@ label_filename_test = ./test_label
 # train_dev_percent = 0.10
 # test_dev_percent = 0.10
 
-batch_size = 512
+batch_size = 256
 
 # model options
-model_type = preactresnet18
+model_type = muxnet_m
 model_options = {"nfilters": 64, "nclasses": 10}
 loss_type = Classification
 loss_options = {}
-evaluation_type = Top1Classification
-evaluation_options = {}
+evaluation_type = Classification
+evaluation_options = {"topk": "(1,5)"}
 
-resolution_high = 32
-resolution_wide = 32
+resolution_high = 224
+resolution_wide = 224
 
 manual_seed = 0
 nepochs = 350
@@ -46,5 +46,5 @@ scheduler_options = {"milestones": [150, 250]}
 
 # cpu/gpu settings
 # ngpu=0 uses cpu by default
-ngpu = 1
-nthreads = 20
+ngpu = 4
+nthreads = 8

@@ -88,7 +88,10 @@ class Visualizer:
                 temp = self.values[key]['value'].numpy()
                 for i in range(temp.shape[0]):
                     temp[i] = temp[i] - temp[i].min()
-                    temp[i] = temp[i] / temp[i].max()
+                    if temp[i].max() != 0:
+                        temp[i] = temp[i] / temp[i].max()
+                    else:
+                        temp[i] = temp[i] + minval
                 if self.iteration == 0:
                     self.values[key]['win'] = self.viz.image(
                         temp,
@@ -106,7 +109,10 @@ class Visualizer:
                 for i in range(temp.shape[0]):
                     for j in range(temp.shape[1]):
                         temp[i][j] = temp[i][j] - temp[i][j].min()
-                        temp[i][j] = temp[i][j] / temp[i][j].max()
+                        if temp[i][j].max() != 0:
+                            temp[i][j] = temp[i][j] / temp[i][j].max()
+                        else:
+                            temp[i][j] = temp[i][j] + minval
                 if self.iteration == 0:
                     self.values[key]['win'] = self.viz.images(
                         temp,

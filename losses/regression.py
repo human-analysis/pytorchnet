@@ -12,6 +12,6 @@ class Regression(nn.Module):
         self.loss = nn.MSELoss()
 
     def __call__(self, inputs, target):
-        loss = self.loss.forward(inputs, target)
+        loss = self.loss(inputs, target)
 
         return loss
