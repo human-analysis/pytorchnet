@@ -1,67 +1,53 @@
 # main.py
 
+import os
 import sys
-import traceback
-import torch
-import random
-import config
 import utils
-from model import Model
-from test import Tester
-from train import Trainer
-from dataloader import Dataloader
-from checkpoints import Checkpoints
+import config
+import traceback
 
+import pytorch_lightning as pl
+from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.loggers import TensorBoardLogger
+
+import datasets
+from model import Model
 
 def main():
     # parse the arguments
     args = config.parse_args()
-    if (args.ngpu > 0 and torch.cuda.is_available()):
-        device = "cuda:0"
-    else:
-        device = "cpu"
-    args.device = torch.device(device)
-    random.seed(args.manual_seed)
-    torch.manual_seed(args.manual_seed)
-    if args.save_results:
-        utils.saveargs(args)
 
-    # initialize the checkpoint class
-    checkpoints = Checkpoints(args)
+    pl.seed_everything(args.manual_seed)    
+    utils.saveargs(args)
 
-    # Create Model
-    models = Model(args)
-    model, criterion, evaluation = models.setup(checkpoints)
+    logger = TensorBoardLogger(
+        save_dir=args.logs_dir,
+        log_graph=True,
+        name=args.project_name
+    )
 
-    print('Model:\n\t{model}\nTotal params:\n\t{npar:.2f}M'.format(
-          model=args.model_type,
-          npar=sum(p.numel() for p in model.parameters()) / 1000000.0))
+    data = getattr(datasets, args.dataset)(args)
+    model = Model(args)
 
-    # Data Loading
-    dataloader = Dataloader(args)
-    loaders = dataloader.create()
+    checkpoint_callback = ModelCheckpoint(
+        filepath=os.path.join(args.save_dir, args.project_name + '-{epoch:03d}-{val_loss:.3f}'),
+        monitor='val_loss',
+        save_top_k=3)
 
-    # The trainer handles the training loop
-    trainer = Trainer(args, model, criterion, evaluation)
-    # The trainer handles the evaluation on validation set
-    tester = Tester(args, model, criterion, evaluation)
+    trainer = pl.Trainer(
+        gpus=args.ngpu,
+        accelerator='ddp',
+        sync_batchnorm=True,
+        benchmark=True,
+        checkpoint_callback=checkpoint_callback,
+        logger=logger,
+        min_epochs=1,
+        max_epochs=args.nepochs,        
+        precision=args.precision,
+        reload_dataloaders_every_epoch=True,
+    )
 
-    # start training !!!
-    loss_best = 1e10
-    for epoch in range(args.nepochs):
-        print('\nEpoch %d/%d\n' % (epoch + 1, args.nepochs))
-
-        # train for a single epoch
-        loss_train = trainer.train(epoch, loaders)
-        with torch.no_grad():  # operations inside don't track history
-            loss_test = tester.test(epoch, loaders)
-
-        if loss_best > loss_test:
-            model_best = True
-            loss_best = loss_test
-            if args.save_results:
-                checkpoints.save(epoch, model, model_best)
-
+    trainer.fit(model, data)
 
 if __name__ == "__main__":
     utils.setup_graceful_exit()

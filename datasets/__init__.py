@@ -1,7 +1,5 @@
 # __init__.py
 
-from torchvision.datasets import *
-from .filelist import FileListLoader
-from .folderlist import FolderListLoader
-from .transforms import *
-from folderlmdb import ImageFolderLMDB
+from .cifar import *
+from .mscoco import *
+from .imagenet import *

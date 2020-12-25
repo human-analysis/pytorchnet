@@ -1,50 +1,75 @@
 # model.py
 
-import math
+import torch
+import pytorch_lightning as pl
+from collections import OrderedDict
+
 import models
 import losses
 import evaluate
-from torch import nn
 
+class Model(pl.LightningModule):
+    def __init__(self, opts):
+        super().__init__()
+        self.save_hyperparameters()
+        self.opts = opts
 
-def weights_init(m):
-    if isinstance(m, nn.Conv2d):
-        n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-        m.weight.normal_(0, math.sqrt(2. / n))
-    elif isinstance(m, nn.BatchNorm2d):
-        m.weight.fill_(1)
-        m.bias.zero_()
-    elif isinstance(m, nn.Linear):
-        m.weight.normal_(0, 1)
-        m.bias.zero_()
+        self.model = getattr(models, opts.model_type)(**opts.model_options)
+        
+        self.val_loss = getattr(losses, opts.loss_type)(**opts.loss_options)
+        self.train_loss = getattr(losses, opts.loss_type)(**opts.loss_options)
+        
+        self.acc_trn = getattr(pl.metrics, opts.evaluation_type)(**opts.evaluation_options)
+        self.acc_val = getattr(pl.metrics, opts.evaluation_type)(**opts.evaluation_options)
+        self.acc_tst = getattr(pl.metrics, opts.evaluation_type)(**opts.evaluation_options)
 
+    def training_step(self, batch, batch_idx):
+        images, labels = batch
+        out = self.model(images)
+        loss = self.train_loss(out, labels)
+        acc = self.acc_trn(out, labels)        
+        self.log('train_loss', loss, on_step=False,
+                 on_epoch=True, sync_dist=True)
+        self.log('train_acc', acc, on_step=False,
+                 on_epoch=True, sync_dist=True)
+        output = OrderedDict({
+            'loss': loss,
+            'acc': acc
+        })
+        return output
 
-class Model:
-    def __init__(self, args):
-        self.ngpu = args.ngpu
-        self.device = args.device
-        self.model_type = args.model_type
-        self.model_options = args.model_options
-        self.loss_type = args.loss_type
-        self.loss_options = args.loss_options
-        self.evaluation_type = args.evaluation_type
-        self.evaluation_options = args.evaluation_options
+    def validation_step(self, batch, batch_idx):
+        images, labels = batch
+        out = self.model(images)
+        loss = self.val_loss(out, labels)
+        acc = self.acc_val(out, labels)
+        self.log('val_loss', loss, on_step=False,
+                 on_epoch=True, sync_dist=True)
+        self.log('val_acc', acc, on_step=False,
+                 on_epoch=True, sync_dist=True)
+        output = OrderedDict({
+            'loss': loss,
+            'acc': acc
+        })
+        return output
+    
+    def testing_step(self, batch, batch_idx):
+        images, labels = batch
+        out = self.model(images)
+        acc = self.acc_tst(out, labels)        
+        self.log('test_acc', acc, on_step=False,
+                 on_epoch=True, sync_dist=True)
+        output = OrderedDict({            
+            'acc': acc
+        })
+        return output
 
-    def setup(self, checkpoints):
-        model = getattr(models, self.model_type)(**self.model_options)
-        criterion = getattr(losses, self.loss_type)(**self.loss_options)
-        evaluation = getattr(evaluate, self.evaluation_type)(
-            **self.evaluation_options)
-
-        if self.ngpu > 1:
-            model = nn.DataParallel(model, device_ids=list(range(self.ngpu)))
-        model = model.to(self.device)
-        criterion = criterion.to(self.device)
-
-        if checkpoints.latest('resume') is None:
-            pass
-            # model.apply(weights_init)
-        else:
-            model = checkpoints.load(model, checkpoints.latest('resume'))
-
-        return model, criterion, evaluation
+    def configure_optimizers(self):
+        optimizer = getattr(torch.optim, self.opts.optim_method)(
+            filter(lambda p: p.requires_grad, self.model.parameters()),
+            lr=self.opts.learning_rate, **self.opts.optim_options)
+        if self.opts.scheduler_method is not None:
+            scheduler = getattr(torch.optim.lr_scheduler, self.opts.scheduler_method)(
+                optimizer, **self.opts.scheduler_options
+            )
+        return [optimizer], [scheduler]

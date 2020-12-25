@@ -119,26 +119,3 @@ def str2bool(v):
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
-
-
-def gaussian(size, center, sigma=1):
-    if np.isnan(center[0]) or np.isnan(center[1]):
-        return np.zeros(size)
-
-    x, y = np.meshgrid(np.arange(size[0]), np.arange(size[1]))
-    if center is None:
-        x0 = y0 = size // 2
-    else:
-        x0 = center[0]
-        y0 = center[1]
-    den = 2 * pow(sigma, 2)
-    num = np.power(x - x0, 2) + np.power(y - y0, 2)
-    return np.exp(-(num / den)) / math.sqrt(2 * np.pi * sigma * sigma)
-
-
-def plotlify(fig, env='main', win='mywin'):
-    fig = {key: fig[key] for key in fig.keys()}
-    fig['win'] = win
-    fig['eid'] = env
-
-    return fig

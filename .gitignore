@@ -96,10 +96,9 @@ ENV/
 # mkdocs documentation
 /site
 
-# results folder
+# folders
+.vscode
 results/
-
-# data folder
 data/
 
 # OS Files
