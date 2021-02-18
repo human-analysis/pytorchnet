@@ -59,25 +59,17 @@ When PyTorchNet is being run, it will automatically load all parameters from [ar
 > [Arguments]
 > save_results = No\
 > \
->
 > #project options\
->
 > project_name=CIFAR10\
 > save_dir=results/\
 > logs_dir=results/\
->
 > \
->
 > #dataset options\
->
 > dataset=CIFAR10\
 > dataroot=data/\
 > cache_size=1000\
->
 > \
->
 > #model options\
->
 > precision=32\
 > batch_size_test = 128\
 > batch_size_train = 128\
@@ -97,14 +89,10 @@ When PyTorchNet is being run, it will automatically load all parameters from [ar
 >
 > scheduler_method = CosineAnnealingLR\
 > scheduler_options = {"T_max": 200}\
->
 > \
->
 > #cpu/gpu settings\
->
 > ngpu = 1\
 > nthreads = 4\
-
 
 
 
