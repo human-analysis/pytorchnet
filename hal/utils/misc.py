@@ -2,8 +2,6 @@
 
 import os
 import csv
-import math
-import numpy as np
 import argparse
 from inspect import getframeinfo, stack
 import json
@@ -119,3 +117,33 @@ def str2bool(v):
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
+def plotlify(fig, env='main', win='mywin'):
+    fig = {key: fig[key] for key in fig.keys()}
+    fig['win'] = win
+    fig['eid'] = env
+
+    return fig
+
+def print_model_parameters(model):
+    len1 = 0;len2 = 0
+    values = []
+    for key in model:
+        values.append(key)
+        values.append(sum(p.numel() for p in model[key].parameters()) / 1000000.0)
+
+    len_dash = 31
+
+    print_format = '| {:<10} | {:<14} | \n'
+    print_format += "-"*len_dash + '\n'
+
+    for key in model:
+        print_format += '| {:<10} | {:<14.4f} |'
+    
+    print("-"*len_dash)
+    print(print_format.format(
+        *['Model Name', 'Parameters (M)'] + 
+        values
+    ))
+    print("-"*len_dash)

@@ -1,14 +1,13 @@
 # mscoco.py
 
-import pytorch_lightning as pl
-
-from dataflow.serialize import LMDBSerializer
-from dataflow.parallel import MultiProcessRunnerZMQ
-from dataflow.common import LocallyShuffleData, MapData, BatchData
+import hal.datasets as datasets
+from hal.dataflow.serialize import LMDBSerializer
+from hal.dataflow.parallel import MultiProcessRunnerZMQ
+from hal.dataflow.common import LocallyShuffleData, MapData, BatchData
 
 __all__ = ['MSCOCOPose']
 
-class MSCOCOPose(pl.LightningDataModule):
+class MSCOCOPose:
     def __init__(self, opts):
         super().__init__()
         self.opts = opts
@@ -35,7 +34,7 @@ class MSCOCOPose(pl.LightningDataModule):
     def val_dataloader(self):
         return enumerate(self.ds_val)
 
-class MSCOCOSegmentation(pl.LightningDataModule):
+class MSCOCOSegmentation:
     def __init__(self, opts):
         super().__init__()
         self.opts = opts

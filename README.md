@@ -1,7 +1,7 @@
 
 # Welcome to *PyTorchNet*!
 
-****PyTorchNet**** is a Machine Learning framework that is built on top of [PyTorch](https://github.com/pytorch/pytorch). And, it uses Tensorboard for visualization.
+****PyTorchNet**** is a Machine Learning framework that is built on top of [PyTorch](https://github.com/pytorch/pytorch). And, it uses Tensorboard (or Visdom) for visualization.
 
 PyTorchNet is easy to be customized by creating the necessary classes:
  1. **Data Loading**: a dataset class is required to load the data.

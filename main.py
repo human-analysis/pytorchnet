@@ -2,23 +2,25 @@
 
 import os
 import sys
-import utils
 import config
 import traceback
+from hal.utils import misc
 
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 
-import datasets
 from model import Model
+import hal.datasets as datasets
 
 def main():
     # parse the arguments
     args = config.parse_args()
 
-    pl.seed_everything(args.manual_seed)    
-    utils.saveargs(args)
+    if (args.ngpu == 0):
+        args.device = 'cpu'
+
+    pl.seed_everything(args.manual_seed)
 
     logger = TensorBoardLogger(
         save_dir=args.logs_dir,
@@ -26,31 +28,39 @@ def main():
         name=args.project_name
     )
 
-    data = getattr(datasets, args.dataset)(args)
-    model = Model(args)
+    dataloader = getattr(datasets, args.dataset)(args)
+    model = Model(args, dataloader)
 
     checkpoint_callback = ModelCheckpoint(
         filepath=os.path.join(args.save_dir, args.project_name + '-{epoch:03d}-{val_loss:.3f}'),
         monitor='val_loss',
         save_top_k=3)
 
+    if args.ngpu == 0:
+        accelerator = None
+        sync_batchnorm = False
+    else:
+        accelerator = 'ddp'
+        sync_batchnorm = True
+
     trainer = pl.Trainer(
         gpus=args.ngpu,
-        accelerator='ddp',
-        sync_batchnorm=True,
+        accelerator=accelerator,
+        sync_batchnorm=sync_batchnorm,
         benchmark=True,
         checkpoint_callback=checkpoint_callback,
         logger=logger,
         min_epochs=1,
-        max_epochs=args.nepochs,        
+        max_epochs=args.nepochs,
         precision=args.precision,
         reload_dataloaders_every_epoch=True,
-    )
+        )
 
-    trainer.fit(model, data)
+    trainer.fit(model)
+    trainer.test(model, test_dataloaders=dataloader.test_dataloader())
 
 if __name__ == "__main__":
-    utils.setup_graceful_exit()
+    misc.setup_graceful_exit()
     try:
         main()
     except (KeyboardInterrupt, SystemExit):
@@ -60,4 +70,4 @@ if __name__ == "__main__":
         traceback.print_exc(file=sys.stdout)
     finally:
         traceback.print_exc(file=sys.stdout)
-        utils.cleanup()
+        misc.cleanup()

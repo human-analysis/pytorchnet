@@ -2,13 +2,9 @@
 
 import torch
 import pytorch_lightning as pl
-
-import dataflow
-from dataflow.serialize import LMDBSerializer
-from dataflow.parallel import MultiProcessRunnerZMQ
-from dataflow.parallel_map import MultiProcessMapDataZMQ
-from dataflow.common import LocallyShuffleData, MapData, BatchData
-from dataflow import imgaug
+from hal.dataflow.serialize import LMDBSerializer
+from hal.dataflow.parallel import MultiProcessRunnerZMQ
+from hal.dataflow.common import LocallyShuffleData, MapData, BatchData
 
 from .augmentors import Augmentor
 
@@ -17,9 +13,9 @@ __all__ = ['ImageNet']
 class ImageNet(pl.LightningDataModule):
     def __init__(self, opts):
         super().__init__()
-        self.opts = opts        
+        self.opts = opts
 
-    def setup(self, stage=None):
+    def setup(self):
 
         num_replicas = self.opts.ngpus
         if self.opts.ngpus > 1:

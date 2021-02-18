@@ -1,0 +1,41 @@
+[Arguments]
+
+# project options
+project_name=ImageNet
+save_dir=results/
+logs_dir=results/
+
+# dataset options
+dataset=ImageNet
+dataroot=/data/
+data_filename_val=/data/ImageNet/lmdb/2017-ImageNet-val.lmdb
+data_filename_train=/data/ImageNet/lmdb/2017-ImageNet-train.lmdb
+cache_size=100000
+
+# model options
+precision=32
+batch_size_test=224
+batch_size_train=224
+model_type = MobileNetV2
+model_options = {}
+loss_type = Classification
+loss_options = {}
+evaluation_type = Accuracy
+evaluation_options = {}
+
+resolution_high=224
+resolution_wide=224
+
+manual_seed = 0
+nepochs = 200
+
+optim_method = SGD
+learning_rate = 0.1
+optim_options = {"momentum": 0.9, "weight_decay": 5e-4}
+
+scheduler_method = CosineAnnealingLR
+scheduler_options = {"T_max": 200}
+
+# cpu/gpu settings
+ngpu = 1
+nthreads = 4

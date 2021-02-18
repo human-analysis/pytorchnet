@@ -1,10 +1,11 @@
 # config.py
+
 import os
 import datetime
 import argparse
 import json
 import configparser
-import utils
+from hal.utils import misc
 import re
 from ast import literal_eval as make_tuple
 
@@ -14,24 +15,22 @@ def parse_args():
     now = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     result_path = os.path.join(result_path, now)
 
-    parser = argparse.ArgumentParser(description='Your project title goes here')
+    parser = argparse.ArgumentParser(description='Your Project Name')
 
     # the following two parameters can only be provided at the command line.
     parser.add_argument('--result-path', type=str, default=result_path, metavar='', help='full path to store the results')
     parser.add_argument("-c", "--config", "--args-file", dest="config_file", default="args.txt", help="Specify a config file", metavar="FILE")
     args, remaining_argv = parser.parse_known_args()
 
-    result_path = args.result_path
-    # add date and time to the result directory name
-    if now not in result_path:
-        result_path = os.path.join(result_path, now)
-
-    # ======================= Project Setings =====================================
+    # ======================= Project Settings =====================================
     parser.add_argument('--project-name', type=str, default='myproject', metavar='', help='name of the project')
     parser.add_argument('--save-dir', type=str, default=os.path.join(result_path, 'Save'), metavar='', help='save the trained models here')
     parser.add_argument('--logs-dir', type=str, default=os.path.join(result_path, 'Logs'), metavar='', help='save the training log files here')
+    parser.add_argument('--monitor', type=json.loads, default={}, metavar='', help='metric based on which we save models')
+    parser.add_argument('--checkpoint-max-history', type=int, default=10, metavar='', help='max checkpopint history')
+    parser.add_argument('-s', '--save', '--save-results', type=misc.str2bool, dest="save_results",default='No', metavar='', help='save the arguments and the results')
 
-    # ======================= Data Setings =====================================
+    # ======================= Data Settings =====================================
     parser.add_argument('--dataset-root-test', type=str, default=None, help='path of the data')
     parser.add_argument('--dataset-root-train', type=str, default=None, help='path of the data')
     parser.add_argument('--dataset-test', type=str, default=None, help='name of training dataset')
@@ -49,13 +48,14 @@ def parse_args():
     parser.add_argument('--label-filename-train', type=str, default=None, help='label train filename for filelist and folderlist')
     parser.add_argument('--loader-input', type=str, default=None, help='input loader')
     parser.add_argument('--loader-label', type=str, default=None, help='label loader')
-    parser.add_argument('--dataset-options', type=json.loads, default=None, metavar='', help='additional model-specific parameters, i.e. \'{"gauss": 1}\'')
+    parser.add_argument('--dataset-options', type=json.loads, default=None, metavar='', help='additional model-specific parameters')
     parser.add_argument('--transform-trn', type=json.loads, default={}, metavar='', help='training data transforms')
     parser.add_argument('--transform-val', type=json.loads, default={}, metavar='', help='validation data transforms')
     parser.add_argument('--transform-tst', type=json.loads, default={}, metavar='', help='testing data transforms')
     parser.add_argument('--cache-size', type=int, default=None, help='lmdb data loader cache size')
+    parser.add_argument('--dataset-type', type=str, default=None, help='dataset type')
 
-    # ======================= Network Model Setings ============================
+    # ======================= Network Model Settings ============================
     parser.add_argument('--model-type', type=str, default=None, help='type of network')
     parser.add_argument('--model-options', type=json.loads, default={}, metavar='', help='additional model-specific parameters, i.e. \'{"nstack": 1}\'')
     parser.add_argument('--loss-type', type=str, default=None, help='loss method')
@@ -68,8 +68,7 @@ def parse_args():
     parser.add_argument('--nunits', type=int, default=None, help='number of units in hidden layers')
     parser.add_argument('--dropout', type=float, default=None, help='dropout parameter')
     parser.add_argument('--length-scale', type=float, default=None, help='length scale')
-    parser.add_argument('--tau', type=float, default=None, help='Tau')
-    parser.add_argument('--precision', type=int, default=None, help='model precision')
+    parser.add_argument('--precision', type=int, default=32, help='model precision')
 
     # ======================= Training Settings ================================
     parser.add_argument('--ngpu', type=int, default=None, help='number of gpus to use')
@@ -80,13 +79,19 @@ def parse_args():
     parser.add_argument('--epoch-number', type=int, default=None, help='epoch number')
     parser.add_argument('--nthreads', type=int, default=None, help='number of threads for data loading')
     parser.add_argument('--manual-seed', type=int, default=None, help='manual seed for randomness')
+    parser.add_argument('--check-val-every-n-epochs', type=int, default=1, help='validation every n epochs')
+    parser.add_argument("--local_rank", default=0, type=int)
 
-    # ======================= Hyperparameter Setings ===========================
+    # ======================= Hyperparameter Settings ===========================
     parser.add_argument('--learning-rate', type=float, default=None, help='learning rate')
     parser.add_argument('--optim-method', type=str, default=None, help='the optimization routine ')
     parser.add_argument('--optim-options', type=json.loads, default={}, metavar='', help='optimizer-specific parameters, i.e. \'{"lr": 0.001}\'')
     parser.add_argument('--scheduler-method', type=str, default=None, help='cosine, step, exponential, plateau')
-    parser.add_argument('--scheduler-options', type=json.loads, default={}, metavar='', help='optimizer-specific parameters')    
+    parser.add_argument('--scheduler-options', type=json.loads, default={}, metavar='', help='optimizer-specific parameters')
+
+    # ======================= Visualizer Settings ===========================
+    parser.add_argument('--visualizer', type=str, default='VisualizerTensorboard', help='VisualizerTensorboard or VisualizerVisdom')
+    parser.add_argument('--same-env', type=misc.str2bool, default='No', metavar='',help='does not add date and time to the visdom environment name')
 
     if os.path.exists(args.config_file):
         config = configparser.ConfigParser()
@@ -96,7 +101,12 @@ def parse_args():
 
     args = parser.parse_args(remaining_argv)
 
-    # add date and time to the name of the result
+    # add date and time to the name of Visdom environment and the result
+    if args.visualizer == 'VisualizerVisdom':
+        if args.env == '':
+            args.env = args.model_type
+        if not args.same_env:
+            args.env += '_' + now
     args.result_path = result_path
 
     # refine tuple arguments: this section converts tuples that are
@@ -104,7 +114,6 @@ def parse_args():
     pattern = re.compile('^\(.+\)')
 
     for arg_name in vars(args):
-        # print(arg, getattr(args, arg))
         arg_value = getattr(args, arg_name)
         if isinstance(arg_value, str) and pattern.match(arg_value):
             setattr(args, arg_name, make_tuple(arg_value))
