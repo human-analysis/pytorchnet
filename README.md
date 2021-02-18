@@ -76,17 +76,17 @@ When PyTorchNet is being run, it will automatically load all parameters from [ar
 > model_type = MobileNetV2\
 > loss_type = Classification\
 > evaluation_type = Accuracy\
->
+> \
 > resolution_high = 32\
 > resolution_wide = 32\
->
+> \
 > manual_seed = 0\
 > nepochs = 200\
->
+> \
 > optim_method = SGD\
 > learning_rate = 0.1\
 > optim_options = {"momentum": 0.9, "weight_decay": 5e-4}\
->
+> \
 > scheduler_method = CosineAnnealingLR\
 > scheduler_options = {"T_max": 200}\
 > \
