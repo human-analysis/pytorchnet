@@ -10,14 +10,17 @@ PyTorchNet is easy to be customized by creating the necessary classes:
  4. **Evaluation Metric**: a class to measure the accuracy of the results.
 
 # Structure
-PyTorchNet consists of the following packages:
-## Datasets
+PyTorchNet consists of HAL library which has the following packages:
+## HAL/Datasets
+
 This is for loading and transforming datasets.
-## Models
+## HAL/Models
+
 Network models are kept in this package. It already includes [ResNet](https://arxiv.org/abs/1512.03385), [PreActResNet](https://arxiv.org/abs/1603.05027), [Stacked Hourglass](https://arxiv.org/abs/1603.06937) and [SphereFace](https://arxiv.org/abs/1704.08063).
-## Losses
+## HAL/Losses
+
 There are number of different choices available for Classification or Regression. New loss methods can be put here.
-## Evaluate
+## HAL/Metrics
 
 There are number of different choices available for Classification or Regression. New accuracy metrics can be put here.
 
@@ -54,17 +57,58 @@ When PyTorchNet is being run, it will automatically load all parameters from [ar
 > python main.py --config custom_args.txt
 ### args.txt
 > [Arguments]
->  save_results = No\
+> save_results = No\
 > \
-> \# dataset options\
-> dataroot = ./data\
-> dataset_train = CIFAR10\
-> dataset_test = CIFAR10\
-> batch_size = 64
-> 
+>
+> #project options\
+>
+> project_name=CIFAR10\
+> save_dir=results/\
+> logs_dir=results/\
+>
+> \
+>
+> #dataset options\
+>
+> dataset=CIFAR10\
+> dataroot=data/\
+> cache_size=1000\
+>
+> \
+>
+> #model options\
+>
+> precision=32\
+> batch_size_test = 128\
+> batch_size_train = 128\
+> model_type = MobileNetV2\
+> loss_type = Classification\
+> evaluation_type = Accuracy\
+>
+> resolution_high = 32\
+> resolution_wide = 32\
+>
+> manual_seed = 0\
+> nepochs = 200\
+>
+> optim_method = SGD\
+> learning_rate = 0.1\
+> optim_options = {"momentum": 0.9, "weight_decay": 5e-4}\
+>
+> scheduler_method = CosineAnnealingLR\
+> scheduler_options = {"T_max": 200}\
+>
+> \
+>
+> #cpu/gpu settings\
+>
+> ngpu = 1\
+> nthreads = 4\
+
+
 
 
 ## Command line
 Parameters can also be set in the command line when invoking [main.py](https://github.com/human-analysis/pytorchnet/blob/master/main.py). These parameters will precede the existing parameters in the configuration file.
-> python [main.py](https://github.com/human-analysis/pytorchnet/blob/master/main.py) --log-type progressbar
+> python [main.py](https://github.com/human-analysis/pytorchnet/blob/master/main.py) --visualizer VisualizerTensorboard
 
