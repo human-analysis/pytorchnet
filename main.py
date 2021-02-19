@@ -32,7 +32,7 @@ def main():
     model = Model(args, dataloader)
 
     checkpoint_callback = ModelCheckpoint(
-        dirpath=args.save_dir,
+        dirpath=os.path.join(args.save_dir, args.project_name),
         filename=args.project_name + '-{epoch:03d}-{val_loss:.3f}',
         monitor='val_loss',
         save_top_k=3)

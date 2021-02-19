@@ -18,7 +18,6 @@ class Model(pl.LightningModule):
         self.val_dataloader = dataloader.val_dataloader
         self.train_dataloader = dataloader.train_dataloader
 
-
         self.model = getattr(models, opts.model_type)(**opts.model_options)
         self.val_loss = getattr(losses, opts.loss_type)(**opts.loss_options)
         self.train_loss = getattr(losses, opts.loss_type)(**opts.loss_options)
@@ -32,8 +31,8 @@ class Model(pl.LightningModule):
         out = self.model(images)
         loss = self.train_loss(out, labels)
         acc = self.acc_trn(F.softmax(out, dim=1), labels)        
-        self.log('train_loss', loss, on_step=False, on_epoch=True)
-        self.log('train_acc', acc, on_step=False, on_epoch=True)
+        self.log('train_loss', loss, on_step=False, on_epoch=True, prog_bar=True)
+        self.log('train_acc', acc, on_step=False, on_epoch=True, prog_bar=True)
         output = OrderedDict({
             'loss': loss,
             'acc': acc
@@ -45,8 +44,8 @@ class Model(pl.LightningModule):
         out = self.model(images)
         loss = self.val_loss(out, labels)
         acc = self.acc_val(F.softmax(out, dim=1), labels)
-        self.log('val_loss', loss, on_step=False, on_epoch=True)
-        self.log('val_acc', acc, on_step=False, on_epoch=True)
+        self.log('val_loss', loss, on_step=False, on_epoch=True, prog_bar=True)
+        self.log('val_acc', acc, on_step=False, on_epoch=True, prog_bar=True)
         output = OrderedDict({
             'loss': loss,
             'acc': acc
@@ -57,7 +56,7 @@ class Model(pl.LightningModule):
         images, labels = batch
         out = self.model(images)
         acc = self.acc_tst(F.softmax(out, dim=1), labels)
-        self.log('test_acc', acc, on_step=False, on_epoch=True)
+        self.log('test_acc', acc, on_step=False, on_epoch=True, prog_bar=True)
 
     def configure_optimizers(self):
         optimizer = getattr(torch.optim, self.opts.optim_method)(
