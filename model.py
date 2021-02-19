@@ -2,6 +2,7 @@
 
 import torch
 import pytorch_lightning as pl
+import torch.nn.functional as F
 from collections import OrderedDict
 
 import hal.models as models
@@ -30,7 +31,7 @@ class Model(pl.LightningModule):
         images, labels = batch
         out = self.model(images)
         loss = self.train_loss(out, labels)
-        acc = self.acc_trn(out, labels)        
+        acc = self.acc_trn(F.softmax(out, dim=1), labels)        
         self.log('train_loss', loss, on_step=False, on_epoch=True)
         self.log('train_acc', acc, on_step=False, on_epoch=True)
         output = OrderedDict({
@@ -43,7 +44,7 @@ class Model(pl.LightningModule):
         images, labels = batch
         out = self.model(images)
         loss = self.val_loss(out, labels)
-        acc = self.acc_val(out, labels)
+        acc = self.acc_val(F.softmax(out, dim=1), labels)
         self.log('val_loss', loss, on_step=False, on_epoch=True)
         self.log('val_acc', acc, on_step=False, on_epoch=True)
         output = OrderedDict({
@@ -55,7 +56,7 @@ class Model(pl.LightningModule):
     def testing_step(self, batch, batch_idx):
         images, labels = batch
         out = self.model(images)
-        acc = self.acc_tst(out, labels)        
+        acc = self.acc_tst(F.softmax(out, dim=1), labels)
         self.log('test_acc', acc, on_step=False, on_epoch=True)
 
     def configure_optimizers(self):

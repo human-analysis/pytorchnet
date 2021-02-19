@@ -32,7 +32,8 @@ def main():
     model = Model(args, dataloader)
 
     checkpoint_callback = ModelCheckpoint(
-        filepath=os.path.join(args.save_dir, args.project_name + '-{epoch:03d}-{val_loss:.3f}'),
+        dirpath=args.save_dir,
+        filename=args.project_name + '-{epoch:03d}-{val_loss:.3f}',
         monitor='val_loss',
         save_top_k=3)
 
@@ -57,7 +58,7 @@ def main():
         )
 
     trainer.fit(model)
-    trainer.test(model, test_dataloaders=dataloader.test_dataloader())
+    trainer.predict(model, test_dataloaders=dataloader.test_dataloader())
 
 if __name__ == "__main__":
     misc.setup_graceful_exit()

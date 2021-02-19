@@ -92,7 +92,7 @@ When PyTorchNet is being run, it will automatically load all parameters from [ar
 > \
 > #cpu/gpu settings\
 > ngpu = 1\
-> nthreads = 4\
+> nthreads = 4
 
 
 
