@@ -13,11 +13,12 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from model import Model
 import hal.datasets as datasets
 
+
 def main():
     # parse the arguments
     args = config.parse_args()
 
-    if (args.ngpu == 0):
+    if args.ngpu == 0:
         args.device = 'cpu'
 
     pl.seed_everything(args.manual_seed)
@@ -40,9 +41,12 @@ def main():
     if args.ngpu == 0:
         accelerator = None
         sync_batchnorm = False
-    else:
+    elif args.ngpu > 1:
         accelerator = 'ddp'
         sync_batchnorm = True
+    else:
+        accelerator = 'dp'
+        sync_batchnorm = False
 
     trainer = pl.Trainer(
         gpus=args.ngpu,
@@ -55,10 +59,12 @@ def main():
         max_epochs=args.nepochs,
         precision=args.precision,
         reload_dataloaders_every_epoch=True,
+        check_val_every_n_epoch=args.check_val_every_n_epochs
         )
 
     trainer.fit(model)
     trainer.predict(model, test_dataloaders=dataloader.test_dataloader())
+
 
 if __name__ == "__main__":
     misc.setup_graceful_exit()

@@ -66,4 +66,6 @@ class Model(pl.LightningModule):
             scheduler = getattr(torch.optim.lr_scheduler, self.opts.scheduler_method)(
                 optimizer, **self.opts.scheduler_options
             )
-        return [optimizer], [scheduler]
+            return [optimizer], [scheduler]
+        else:
+            return [optimizer]
