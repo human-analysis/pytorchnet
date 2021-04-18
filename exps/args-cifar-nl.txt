@@ -1,0 +1,38 @@
+[Arguments]
+
+# project options
+project_name=CIFAR10
+save_dir=results/
+logs_dir=results/
+
+# dataset options
+dataset=CIFAR10
+dataroot=data/
+
+# model options
+precision=32
+batch_size_test = 128
+batch_size_train = 128
+model_type = nlresnet18
+model_options = {"num_classes": 10}
+loss_type = Classification
+loss_options = {}
+evaluation_type = Accuracy
+evaluation_options = {}
+
+resolution_high = 224
+resolution_wide = 224
+
+manual_seed = 0
+nepochs = 200
+
+optim_method = SGD
+learning_rate = 0.1
+optim_options = {"momentum": 0.9, "weight_decay": 5e-4}
+
+scheduler_method = CosineAnnealingLR
+scheduler_options = {"T_max": 200}
+
+# cpu/gpu settings
+ngpu = 1
+nthreads = 4
