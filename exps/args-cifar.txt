@@ -35,5 +35,5 @@ scheduler_method = CosineAnnealingLR
 scheduler_options = {"T_max": 200}
 
 # cpu/gpu settings
-ngpu = 1
+ngpu = 0
 nthreads = 4

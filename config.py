@@ -88,6 +88,7 @@ def parse_args():
     parser.add_argument('--optim-options', type=json.loads, default={}, metavar='', help='optimizer-specific parameters, i.e. \'{"lr": 0.001}\'')
     parser.add_argument('--scheduler-method', type=str, default=None, help='cosine, step, exponential, plateau')
     parser.add_argument('--scheduler-options', type=json.loads, default={}, metavar='', help='optimizer-specific parameters')
+    parser.add_argument('--swa', type=bool, default=False, help='Stochastic Weight Averaging')
 
     # ======================= Visualizer Settings ===========================
     parser.add_argument('--visualizer', type=str, default='VisualizerTensorboard', help='VisualizerTensorboard or VisualizerVisdom')

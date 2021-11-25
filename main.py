@@ -7,7 +7,7 @@ import traceback
 from hal.utils import misc
 
 import pytorch_lightning as pl
-from pytorch_lightning.callbacks import ModelCheckpoint
+import pytorch_lightning.callbacks as cbs
 from pytorch_lightning.loggers import TensorBoardLogger
 
 from model import Model
@@ -23,43 +23,54 @@ def main():
 
     pl.seed_everything(args.manual_seed)
 
-    logger = TensorBoardLogger(
-        save_dir=args.logs_dir,
-        log_graph=True,
-        name=args.project_name
-    )
+    callbacks = [cbs.RichProgressBar()]
+    if args.save_results:
+        logger = TensorBoardLogger(
+            save_dir=args.logs_dir,
+            log_graph=True,
+            name=args.project_name
+        )
+        checkpoint = cbs.ModelCheckpoint(
+            dirpath=os.path.join(args.save_dir, args.project_name),
+            filename=args.project_name + '-{epoch:03d}-{val_loss:.3f}',
+            monitor='val_loss',
+            save_top_k=args.checkpoint_max_history,
+            save_weights_only=True
+            )
+        enable_checkpointing = True
+        callbacks.append(checkpoint)
+    else:
+        logger=False
+        checkpoint=None
+        enable_checkpointing=False
+    
+    if args.swa:
+        callbacks.append(cbs.StochasticWeightAveraging())
 
     dataloader = getattr(datasets, args.dataset)(args)
     model = Model(args, dataloader)
 
-    checkpoint_callback = ModelCheckpoint(
-        dirpath=os.path.join(args.save_dir, args.project_name),
-        filename=args.project_name + '-{epoch:03d}-{val_loss:.3f}',
-        monitor='val_loss',
-        save_top_k=3)
-
     if args.ngpu == 0:
-        accelerator = None
+        strategy = None
         sync_batchnorm = False
     elif args.ngpu > 1:
-        accelerator = 'ddp'
+        strategy = 'ddp'
         sync_batchnorm = True
     else:
-        accelerator = 'dp'
+        strategy = 'dp'
         sync_batchnorm = False
 
     trainer = pl.Trainer(
         gpus=args.ngpu,
-        accelerator=accelerator,
+        strategy=strategy,
         sync_batchnorm=sync_batchnorm,
         benchmark=True,
-        checkpoint_callback=checkpoint_callback,
+        callbacks=callbacks,
+        enable_checkpointing=enable_checkpointing,
         logger=logger,
         min_epochs=1,
         max_epochs=args.nepochs,
-        precision=args.precision,
-        reload_dataloaders_every_epoch=True,
-        check_val_every_n_epoch=args.check_val_every_n_epochs
+        precision=args.precision
         )
 
     trainer.fit(model)
